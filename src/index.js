@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 
 // import mongoose from 'mongoose';
 // import {DB_NAME} from './constant.js';
+import { app } from './app.js';
 import connectDB from './db/db.js';
 
 dotenv.config({
@@ -23,7 +24,7 @@ connectDB()
   })
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
-    process.exit(1); 
+    process.exit(1);
   });
 
 
