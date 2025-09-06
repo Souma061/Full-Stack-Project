@@ -2,56 +2,49 @@ import mongoose  from 'mongoose';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
+
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required:true,
-    lowerCase:true,
-    trim:true,
-    index:true,
-    unique:true,
+    required: true,
+    lowercase: true,
+    trim: true,
+    index: true,
+    unique: true,
   },
-    email: {
+  email: {
     type: String,
-    required:true,
-    lowerCase:true,
-    trim:true,
-    unique:true,
-
+    required: true,
+    lowercase: true,
+    trim: true,
+    unique: true,
+    match: [/^\S+@\S+\.\S+$/, "Invalid email"],
   },
-    fullName: {
+  fullName: {
     type: String,
-    required:true,
-    lowerCase:true,
-    trim:true,
+    required: true,
+    trim: true,
   },
   avatar: {
-    type:String, // cloudinary url
-    required:true,
-
+    type: String,
+    // required: true, // consider making optional until upload done
   },
   coverImage: {
-    type:String, // cloudinary url
+    type: String,
   },
-  watchHistory: [
-    {
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Video",
-    }
-  ],
+  watchHistory: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Video",
+  }],
   password: {
-    type:String,
-    required:[true, "Password is required"],
-    minLength:[6, "Password must be at least 6 characters long"],
+    type: String,
+    required: [true, "Password is required"],
+    minlength: [6, "Password must be at least 6 characters long"],
   },
   refreshToken: {
-    type:String,
-
+    type: String,
   }
-
-
-
-}, {timestamps:true});
+}, { timestamps: true });
 
 userSchema.pre("save", async function(next) {
   if(!this.isModified("password")) return next();
@@ -72,9 +65,9 @@ userSchema.methods.generateAccessToken = async function(){
       email:this.email,
       fullName:this.fullName,
     },
-    process.env.ACCESSSS_TOKEN_SECRET,
+    process.env.ACCESSS_TOKEN_SECRET,
     {
-      expiresIn:process.env.ACCESSSS_TOKEN_EXPIERY,
+      expiresIn:process.env.ACCESSS_TOKEN_EXPIERY,
     }
   )
 }
