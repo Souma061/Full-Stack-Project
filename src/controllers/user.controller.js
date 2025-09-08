@@ -107,7 +107,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
 
 const loginUser = asyncHandler(async (req, res) => {
-  // Ensure req.body is at least an object to avoid destructuring errors
+
   if (!req.body) {
     throw new ApiError(400, 'Request body is missing. Set Content-Type: application/json');
   }
@@ -137,8 +137,11 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // allow cookies over http in dev
-    sameSite: 'lax'
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' //Protects against CSRF by not sending cookies
+//                     on most cross-site requests,
+//                     but still works for normal navigation
+//                     (like clicking links).
   };
 
   return res
