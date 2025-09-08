@@ -20,6 +20,7 @@
 // store refresh token in db against user
 // send success response with tokens
 
+import jwt from 'jsonwebtoken';
 import { User } from '../models/users.model.js';
 import { ApiError } from '../utils/apierror.js';
 import { ApiResponse } from '../utils/Apiresponse.js';
@@ -100,46 +101,53 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "User not created");
   }
   return res.status(201).json(
-    new ApiResponse(201, 'User registered successfully', createdUser)
+    new ApiResponse(createdUser, 201, 'User registered successfully')
   );
 });
 
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, username, password } = req.body;
+  // Ensure req.body is at least an object to avoid destructuring errors
+  if (!req.body) {
+    throw new ApiError(400, 'Request body is missing. Set Content-Type: application/json');
+  }
 
-  if (!email || !username) {
-    throw new ApiError(400, "Email and username are required");
+  const { email, username, password } = req.body || {};
+  console.log('Login attempt payload:', req.body);
+
+  if ((!email && !username) || !password) {
+    throw new ApiError(400, 'Provide email or username AND password');
   }
 
   const user = await User.findOne({
-    $or: [{ email }, { username }]
+    $or: [email ? { email } : null, username ? { username } : null].filter(Boolean)
   });
 
   if (!user) {
-    throw new ApiError(404, "User not found, please register");
+    throw new ApiError(404, 'User not found, please register');
   }
 
-  const userPasswordMatch = await user.isPasswordCorrect(password);
-  if (!userPasswordMatch) {
-    throw new ApiError(401, "Invalid credentials");
+  const isMatch = await user.isPasswordCorrect(password);
+  if (!isMatch) {
+    throw new ApiError(401, 'Invalid credentials');
   }
 
   const { accessToken, refreshToken } = await generateAccessandRefreshToken(user._id);
-  const loggedInUser = await User.findById(user._id).select('-password -refreshToken');
+  const sanitizedUser = await User.findById(user._id).select('-password -refreshToken');
 
-  const options = {
+  const cookieOptions = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === 'production', // allow cookies over http in dev
+    sameSite: 'lax'
   };
 
-  return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accessToken", accessToken, options).json(
-    new ApiResponse(200, {
-      user: loggedInUser, accessToken, refreshToken
-    }, "Login successful")
-  );
-
-
+  return res
+    .status(200)
+    .cookie('refreshToken', refreshToken, cookieOptions)
+    .cookie('accessToken', accessToken, cookieOptions)
+    .json(
+      new ApiResponse({ user: sanitizedUser, accessToken, refreshToken }, 200, 'Login successful')
+    );
 });
 
 const logOutUser = asyncHandler(async (req, res) => {
@@ -159,8 +167,37 @@ const logOutUser = asyncHandler(async (req, res) => {
   );
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "Refresh token missing");
+  }
+  try {
+
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const user = await User.findById(decodedToken?._id);
+    if (!user || user.refreshToken !== incomingRefreshToken) {
+      throw new ApiError(401, "Invalid refresh token");
+    }
+
+    const options = {
+      httpOnly: true,
+      secure: true
+    };
+
+    const { accessToken, newRefreshToken } = await generateAccessandRefreshToken(user._id);
+
+    return res.status(200).cookie("refreshToken", newRefreshToken, options).cookie("accessToken", accessToken, options).json(
+      new ApiResponse({ accessToken, refreshToken: newRefreshToken }, 200, "Access token refreshed successfully")
+    );
+  } catch (error) {
+    throw new ApiError(401, error?.message || "Invalid refresh token");
+  }
+});
 
 
-export { loginUser, logOutUser, registerUser };
+
+export { loginUser, logOutUser, registerUser,refreshAccessToken };
 
 
