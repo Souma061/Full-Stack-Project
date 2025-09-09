@@ -217,25 +217,47 @@ const getCurrentUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
 });
 
-const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullName, username, email } = req.body;
 
-  if (!fullName || !username || !email) {
+
+const updateAccountDetails = asyncHandler(async (req, res) => {
+  const { fullName, username, email } = req.body || {};
+
+  // Validate presence and non-empty strings
+  if (![fullName, username, email].every(v => typeof v === 'string' && v.trim() !== '')) {
     throw new ApiError(400, "All fields are required");
   }
 
-  User.findByIdAndUpdate(req.user?._id, {
-    $set: {
-      fullName,
-      username: username.toLowerCase(),
-      email: email,
-    }
-  }, { new: true }).select("-password");
+  const normalized = {
+    fullName: fullName.trim(),
+    username: username.trim().toLowerCase(),
+    email: email.trim().toLowerCase(),
+  };
+
+
+  const conflict = await User.findOne({
+    _id: { $ne: req.user._id },
+    $or: [{ username: normalized.username }, { email: normalized.email }]
+  }).lean();
+
+  if (conflict) {
+    throw new ApiError(409, "Email or username already in use");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    { $set: normalized },
+    { new: true, runValidators: true }
+  ).select("-password -refreshToken");
+
+  if (!updatedUser) {
+    throw new ApiError(404, "User not found");
+  }
 
   return res
     .status(200)
-    .json(new ApiResponse(200, {}, "Account details updated successfully"));
+    .json(new ApiResponse(updatedUser, 200, "Account details updated successfully"));
 });
+
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
   const avatartLocalPath = req.file?.path;
