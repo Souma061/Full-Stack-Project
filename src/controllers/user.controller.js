@@ -215,7 +215,9 @@ const changeUserPassword = asyncHandler(async (req, res) => {
   }
   user.password = newPassword;
   await user.save({ validateBeforeSave: false });
-  return res.status(200).json(new ApiResponse(200, {}, "Password changed successfully"));
+ return res
+  .status(200)
+  .json(new ApiResponse({}, 200, "Password changed successfully"));
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
@@ -368,13 +370,23 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(channel, 200, "Channel profile fetched"));
 });
 
-const getWatchHistory = asyncHandler(async (rq, res) => {
-  const user = await User.aggregate([
-    {
-      $match: {
-        _id: mongoose.Types.ObjectId(rq.user._id)
-      }
-    },
+
+
+const getWatchHistory = asyncHandler(async (req, res) => {
+  // Ensure we have a proper ObjectId
+  const userId = req.user?._id;
+  if (!userId) {
+    throw new ApiError(401, "Unauthorized");
+  }
+
+
+  const normalizedUserId =
+    typeof userId === "string"
+      ? new mongoose.Types.ObjectId(userId)
+      : userId; // already an ObjectId
+
+  const userAgg = await User.aggregate([
+    { $match: { _id: normalizedUserId } },
     {
       $lookup: {
         from: "videos",
@@ -389,33 +401,36 @@ const getWatchHistory = asyncHandler(async (rq, res) => {
               foreignField: "_id",
               as: "owner",
               pipeline: [
-                {
-                  $project: {
-                    fullName: 1,
-                    username: 1,
-                    avatar: 1
-                  }
-                }
+                { $project: { fullName: 1, username: 1, avatar: 1 } }
               ]
             }
-          }, {
-            $addFields: {
-              owner: {
-                $first: "$owner"
+          },
+            { $unwind: "$owner" },
+            {
+              $project: {
+                title: 1,
+                thumbnail: 1,
+                duration: 1,
+                createdAt: 1,
+                owner: 1
               }
             }
-          }
-
         ]
-
       }
-    }
-
+    },
+    { $project: { watchHistory: 1 } }
   ]);
-  return res.status(200).json(new ApiResponse(user[0]?.watchHistory || [], 200, "Watch history fetched successfully"));
+
+  const watchHistory = userAgg[0]?.watchHistory || [];
+
+  return res
+    .status(200)
+    .json(new ApiResponse({ watchHistory }, 200, "Watch history fetched"));
 });
 
-export { changeUserPassword, getCurrentUser, getUserChannelProfile, getWatchHistory, loginUser, logOutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage,getWatchHistory };
+
+
+export { changeUserPassword, getCurrentUser, getUserChannelProfile, getWatchHistory, loginUser, logOutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage };
 
 
 
