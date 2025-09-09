@@ -21,6 +21,7 @@
 // send success response with tokens
 
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { User } from '../models/users.model.js';
 import { ApiError } from '../utils/apierror.js';
 import { ApiResponse } from '../utils/Apiresponse.js';
@@ -357,7 +358,7 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
 
   const channel = channelAgg[0];
   console.dir(channel, { depth: null });
-  
+
   if (!channel) {
     throw new ApiError(404, "Channel not found");
   }
@@ -367,7 +368,54 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
     .json(new ApiResponse(channel, 200, "Channel profile fetched"));
 });
 
-export { changeUserPassword, getCurrentUser, loginUser, logOutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile};
+const getWatchHistory = asyncHandler(async (rq, res) => {
+  const user = await User.aggregate([
+    {
+      $match: {
+        _id: mongoose.Types.ObjectId(rq.user._id)
+      }
+    },
+    {
+      $lookup: {
+        from: "videos",
+        localField: "watchHistory",
+        foreignField: "_id",
+        as: "watchHistory",
+        pipeline: [
+          {
+            $lookup: {
+              from: "users",
+              localField: "owner",
+              foreignField: "_id",
+              as: "owner",
+              pipeline: [
+                {
+                  $project: {
+                    fullName: 1,
+                    username: 1,
+                    avatar: 1
+                  }
+                }
+              ]
+            }
+          }, {
+            $addFields: {
+              owner: {
+                $first: "$owner"
+              }
+            }
+          }
+
+        ]
+
+      }
+    }
+
+  ]);
+  return res.status(200).json(new ApiResponse(user[0]?.watchHistory || [], 200, "Watch history fetched successfully"));
+});
+
+export { changeUserPassword, getCurrentUser, getUserChannelProfile, getWatchHistory, loginUser, logOutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage,getWatchHistory };
 
 
 
