@@ -297,6 +297,84 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, updateCoverImage, "CoverImage updated successfully"));
 });
 
-export { changeUserPassword, getCurrentUser, loginUser, logOutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage };
+
+const getUserChannelProfile = asyncHandler(async (req,res)=> {
+  const {username} = req.params;
+  if(!username?.trim()) {
+    throw new ApiError (400, "Username is required");
+  }
+
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username?.toLowerCase()
+      }
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "channel",
+        as: "subscribers"
+      }
+    },
+    {
+      $lookup: {
+        from: "subscriptions",
+        localField: "_id",
+        foreignField: "subscriber",
+        as: "subscribeToChannels"
+      }
+    },
+    {
+      $addFields: {
+        subscribersCount : {
+          $size: "$subscribers"
+        },
+        channelSubscribedTo: {
+          $size: "$subscribeToChannels"
+        },
+        isSubscribed: {
+          $cond: {
+            if: {
+              $in: [req.user?._id, "$subscribers.subscriber"]
+            },
+            then: true,
+            else: false
+          }
+        }
+      }
+    },
+    {
+      $project: {
+        fullName:1,
+        username:1,
+        email:1,
+        subscribersCount: 1,
+        channelSubscribedTo:1,
+        isSubscribed:1,
+        avatar:1,
+        coverImage:1,
+        about:1,
+        createdAt:1,
+
+      }
+    }
+
+
+  ])
+  if(!channel || channel.length ===0) {
+    throw new ApiError(404, "Channel not found");
+  }
+  return res.status(200).json(new ApiResponse(200, channel[0], "Channel profile fetched successfully"));
+})
+
+export { changeUserPassword, getCurrentUser, loginUser, logOutUser, refreshAccessToken, registerUser, updateAccountDetails, updateUserAvatar, updateUserCoverImage, getUserChannelProfile};
+
+
+
+// aggregate pipeline: mongoose model function that allows us to perform complex data processing and transformation operations on the documents in a collection
+
+
 
 
