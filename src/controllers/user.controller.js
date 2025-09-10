@@ -39,6 +39,14 @@ const generateAccessandRefreshToken = async (userID) => {
   } catch {
     throw new ApiError(500, "Error generating tokens");
   }
+
+  // What I have done so far:
+  // 1. Fetched user by ID
+  // 2. Generated access and refresh tokens
+  // 3. Stored refresh token in DB
+  // 4. Returned tokens
+  // Next steps:
+  // - Handle errors and edge cases (e.g., user not found)
 };
 
 
@@ -105,6 +113,17 @@ const registerUser = asyncHandler(async (req, res) => {
   return res.status(201).json(
     new ApiResponse(createdUser, 201, 'User registered successfully')
   );
+
+  // What I have done so far:
+  // 1. Fetched and normalized input data
+  // 2. Validated required fields and formats
+  // 3. Checked for existing user conflicts
+  // 4. Handled file uploads to Cloudinary
+  // 5. Created new user in DB
+  // 6. Returned sanitized user data in response
+  // Next steps:
+  // - Handle edge cases and errors (e.g., Cloudinary upload failures)
+  // - Test the endpoint with various scenarios (missing fields, invalid data, etc.)
 });
 
 
@@ -153,6 +172,16 @@ const loginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse({ user: sanitizedUser, accessToken, refreshToken }, 200, 'Login successful')
     );
+
+  // What I have done so far:
+  // 1. Validated input presence
+  // 2. Fetched user by email/username
+  // 3. Verified password
+  // 4. Generated tokens
+  // 5. Sent response with cookies and user data
+  // Next steps:
+  // - Handle edge cases (e.g., account locked)
+  // - Test with various scenarios (valid/invalid credentials)
 });
 
 const logOutUser = asyncHandler(async (req, res) => {
@@ -173,6 +202,14 @@ const logOutUser = asyncHandler(async (req, res) => {
     .clearCookie("accessToken", cookieOptions)
     .clearCookie("refreshToken", cookieOptions)
     .json(new ApiResponse({}, 200, "Logged out successfully"));
+
+  // What I have done so far:
+  // 1. Cleared refresh token in DB
+  // 2. Cleared auth cookies
+  // 3. Sent success response
+  // Next steps:
+  // - Test the endpoint to ensure cookies are cleared properly
+  // - Handle edge cases (e.g., user not found)
 });
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
@@ -204,6 +241,15 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   } catch (e) {
     throw new ApiError(401, e?.message || "Invalid refresh token");
   }
+
+  // What I have done so far:
+  // 1. Validated presence of incoming refresh token
+  // 2. Verified token and fetched user
+  // 3. Generated new tokens
+  // 4. Sent response with new tokens in cookies
+  // Next steps:
+  // - Handle edge cases (e.g., expired token)
+  // - Test the endpoint with valid and invalid tokens
 });
 
 const changeUserPassword = asyncHandler(async (req, res) => {
@@ -224,6 +270,13 @@ const getCurrentUser = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(200, req.user, "Current user fetched successfully"));
+
+  // What I have done so far:
+  // 1. Retrieved user from req (set by auth middleware)
+  // 2. Sent user data in response
+  // Next steps:
+  // - Ensure sensitive fields are excluded (e.g., password)
+  // - Test the endpoint to verify it returns correct user data
 });
 
 
@@ -265,6 +318,15 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(updatedUser, 200, "Account details updated successfully"));
+
+  // What I have done so far:
+  // 1. Validated input fields
+  // 2. Checked for email/username conflicts
+  // 3. Updated user details in DB
+  // 4. Returned updated user data
+  // Next steps:
+  // - Handle edge cases (e.g., invalid email format)
+  // - Test the endpoint with various scenarios (conflicts, successful update)
 });
 
 
@@ -286,6 +348,15 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(updated, 200, "Avatar updated successfully"));
+
+  // What I have done so far:
+  // 1. Validated presence of uploaded file
+  // 2. Uploaded avatar to Cloudinary
+  // 3. Updated user record with new avatar URL
+  // 4. Returned updated user data
+  // Next steps:
+  // - Handle upload errors and edge cases
+  // - Test the endpoint with valid and invalid files
 });
 
 const updateUserCoverImage = asyncHandler(async (req, res) => {
@@ -305,6 +376,15 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
   }, { new: true }).select("-password");
 
   return res.status(200).json(new ApiResponse(200, updateCoverImage, "CoverImage updated successfully"));
+
+  // What I have done so far:
+  // 1. Validated presence of uploaded file
+  // 2. Uploaded cover image to Cloudinary
+  // 3. Updated user record with new cover image URL
+  // 4. Returned updated user data
+  // Next steps:
+  // - Handle upload errors and edge cases
+  // - Test the endpoint with valid and invalid files
 });
 
 
@@ -368,6 +448,15 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse(channel, 200, "Channel profile fetched"));
+
+  // What I have done so far:
+  // 1. Validated username param
+  // 2. Queried user by username
+  // 3. Aggregated subscription data
+  // 4. Structured response with channel info
+  // Next steps:
+  // - Test the endpoint with valid and invalid usernames
+  // - Handle edge cases (e.g., user not found)
 });
 
 
@@ -426,6 +515,15 @@ const getWatchHistory = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new ApiResponse({ watchHistory }, 200, "Watch history fetched"));
+
+  // What I have done so far:
+  // 1. Validated user ID from req
+  // 2. Aggregated user's watch history with video and owner details
+  // 3. Structured response with watch history array
+  // Next steps:
+  // - Test the endpoint to ensure correct data is returned
+  // - Handle edge cases (e.g., no watch history)
+
 });
 
 
@@ -438,4 +536,19 @@ export { changeUserPassword, getCurrentUser, getUserChannelProfile, getWatchHist
 
 
 
+// What is aggregation?
+// Aggregation is a way of processing a large number of documents in a collection by means of passing them through different stages. The stages make up what is known as a pipeline. The stages in a pipeline can filter, sort, group, reshape and modify documents that pass through the pipeline.
 
+// Each stage transforms the document as they pass through the pipeline.
+
+// Each stage performs an operation on the input documents. The output of one stage is passed to the next stage as input.
+
+// Common stages include $match (filtering), $group (grouping by fields), $sort (sorting), $project (reshaping documents), and $lookup (joining collections).
+
+// Example: Get total sales per product category
+// db.sales.aggregate([
+//   { $group: { _id: "$category", totalSales: { $sum: "$amount" } } },
+//   { $sort: { totalSales: -1 } }
+// ])
+
+// In this example, sales documents are grouped by category, summing the amount for each category, and then sorted by total sales in descending order.

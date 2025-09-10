@@ -100,6 +100,25 @@ const getAllVideos = asyncHandler(async (req, res) => {
             "Videos fetched successfully"
         )
     );
+    // What I have done so far:
+    // 1. Parsed and validated pagination parameters (page, limit)
+    // 2. Constructed filter object based on query and userId
+    // 3. Set up sorting options based on sortBy and sortType
+    // 4. Used aggregation pipeline to fetch videos with owner details
+    // 5. Calculated total documents and total pages for pagination
+    // 6. Returned structured response with videos and pagination info
+    // Next steps:
+    // - Test the endpoint with various query parameters
+    // - Handle edge cases (e.g., no videos found, invalid userId)
+    // - Optimize performance if needed (e.g., indexing in MongoDB)
+    // - Add caching if necessary for frequently requested data
+    // - Ensure proper error handling and logging
+    // - Write unit and integration tests for this functionality
+    // - Update API documentation to reflect new query parameters and response structure
+    // - Review code for best practices and potential improvements
+    // - Deploy changes to staging environment for further testing
+    // - Monitor performance and user feedback after deployment
+    // - Iterate based on feedback and any issues encountered
 
 });
 
@@ -153,7 +172,23 @@ const publishAVideo = asyncHandler(async (req, res) => {
     return res.status(201).json(new ApiResponse(createVideo, 201, "Video published successfully"));
 
 
-
+    // What I have done so far:
+    // 1. Validated required fields (title, description, video file, thumbnail)
+    // 2. Uploaded video file and thumbnail to Cloudinary
+    // 3. Created a new video document in the database
+    // 4. Populated owner details for the created video
+    // 5. Returned structured response with the created video details
+    // Next steps:
+    // - Test the endpoint with valid and invalid data
+    // - Handle edge cases (e.g., upload failures, database errors)
+    // - Optimize performance if needed (e.g., async uploads)
+    // - Ensure proper error handling and logging
+    // - Write unit and integration tests for this functionality
+    // - Update API documentation to reflect new endpoint and request/response structure
+    // - Review code for best practices and potential improvements
+    // - Deploy changes to staging environment for further testing
+    // - Monitor performance and user feedback after deployment
+    // - Iterate based on feedback and any issues encountered
 
 
 });
@@ -188,6 +223,24 @@ const getVideoById = asyncHandler(async (req, res) => {
     }
 
     return res.status(200).json(new ApiResponse(video, 200, "Video fetched successfully"));
+    // What I have done so far:
+    // 1. Validated video ID
+    // 2. Fetched video by ID and incremented view count
+    // 3. Checked if video exists and is published (if not owner)
+    // 4. Added video to user's watch history if authenticated
+    // 5. Returned structured response with video details
+    // Next steps:
+    // - Test the endpoint with various scenarios (valid ID, invalid ID, unpublished video)
+    // - Handle edge cases (e.g., video not found, database errors)
+    // - Optimize performance if needed (e.g., indexing in MongoDB)
+    // - Ensure proper error handling and logging
+    // - Write unit and integration tests for this functionality
+    // - Update API documentation to reflect new endpoint and response structure
+    // - Review code for best practices and potential improvements
+    // - Deploy changes to staging environment for further testing
+    // - Monitor performance and user feedback after deployment
+    //
+    // - Iterate based on feedback and any issues encountered
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -240,6 +293,14 @@ const updateVideo = asyncHandler(async (req, res) => {
             , 200, "Video updated successfully"
         )
     );
+    // What I have done so far:
+    // 1. Validated video ID and ownership
+    // 2. Validated input fields (title, description)
+    // 3. Handled optional thumbnail upload and update
+    // 4. Updated video document in the database
+    // 5. Returned structured response with updated video details
+    // Next steps:
+    // - Test the endpoint with various scenarios (valid update, invalid data)
 
 });
 
@@ -266,6 +327,21 @@ const deleteVideo = asyncHandler(async (req, res) => {
             , 200, "Video deleted successfully"
         )
     );
+    // What I have done so far:
+    // 1. Validated video ID and ownership
+    // 2. Deleted video document from the database
+    // 3. Returned structured response with deleted video details
+    // Next steps:
+    // - Test the endpoint with various scenarios (valid ID, invalid ID, unauthorized user)
+    // - Handle edge cases (e.g., video not found, database errors)
+    // - Optimize performance if needed
+    // - Ensure proper error handling and logging
+    // - Write unit and integration tests for this functionality
+    // - Update API documentation to reflect new endpoint and response structure
+    // - Review code for best practices and potential improvements
+    // - Deploy changes to staging environment for further testing
+    // - Monitor performance and user feedback after deployment
+    // - Iterate based on feedback and any issues encountered
 });
 
 const togglePublishStatus = asyncHandler(async (req, res) => {
@@ -297,9 +373,25 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
             , 200, statusMessage
         )
     );
+    // What I have done so far:
+    // 1. Validated video ID and ownership
+    // 2. Toggled the isPublished status of the video
+    // 3. Returned structured response with updated video details and status message
+    // Next steps:
+    // - Test the endpoint with various scenarios (valid ID, invalid ID, unauthorized user)
+    // - Handle edge cases (e.g., video not found, database errors)
+    // - Optimize performance if needed
+    // - Ensure proper error handling and logging
+    // - Write unit and integration tests for this functionality
+    // - Update API documentation to reflect new endpoint and response structure
+    // - Review code for best practices and potential improvements
+    // - Deploy changes to staging environment for further testing
+    // - Monitor performance and user feedback after deployment
+    // - Iterate based on feedback and any issues encountered
 });
 
 export {
     deleteVideo, getAllVideos, getVideoById, publishAVideo, togglePublishStatus, updateVideo
 };
 
+//
