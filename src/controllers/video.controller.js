@@ -28,9 +28,9 @@ const getAllVideos = asyncHandler(async (req, res) => {
         filter.$or = [
             { title: { $regex: query, $options: "i" } },
             { description: { $regex: query, $options: 'i' } }
-        ];
+        ]; // it does a case-insensitive search in title and description
     }
-    const sortOptions = {};
+    const sortOptions = {}; // Initialize empty sort options
     if (sortBy) {
         const validSortFields = ['views', 'createdAt', 'title', 'duration', 'createdAt', 'updatedAt'];
         if (validSortFields.includes(sortBy)) {
@@ -38,14 +38,16 @@ const getAllVideos = asyncHandler(async (req, res) => {
         }
     } else {
         sortOptions.createdAt = -1; // default sort by createdAt desc
-    }
+    } // default sort by createdAt desc
 
-    const skip = (pageNum - 1) * limitNum;
+    const skip = (pageNum - 1) * limitNum; // Calculate documents to skip
 
-    const videos = await Video.aggregate([
+    // Using aggregation to join with users collection to get owner details
+
+    const videos = await Video.aggregate([ // Using aggregation to join with users collection to get owner details
         { $match: filter },
         {
-            $lookup: {
+            $lookup: {  // join with users collection to get owner details
                 from: 'users',
                 localField: 'owner',
                 foreignField: '_id',
@@ -62,12 +64,12 @@ const getAllVideos = asyncHandler(async (req, res) => {
                 ]
             }
         },
-        { $unwind: '$owner' },
-        { $sort: sortOptions },
-        { $skip: skip },
-        { $limit: limitNum },
+        { $unwind: '$owner' }, // unwind : deconstructs the array field from the input documents to output a document for each element
+        { $sort: sortOptions }, // sort the results based on sortOptions
+        { $skip: skip }, // skip the first (pageNum - 1) * limitNum documents
+        { $limit: limitNum }, // limit the results to limitNum
         {
-            $project: {
+            $project: {  // project only necessary fields
                 _id: 1,
                 title: 1,
                 description: 1,
@@ -80,7 +82,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     ]);
 
     const totalDocs = await Video.countDocuments(filter);
-    const totalPages = Math.max(1, Math.ceil(totalDocs / limitNum));
+    const totalPages = Math.max(1, Math.ceil(totalDocs / limitNum)); // Calculate total pages
 
 
     return res.status(200).json(
@@ -146,7 +148,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
     // upload to cloudinary
 
-    const videoFile = await uploadOnCloudinary(videoFileLocalPath);
+    const videoFile = await uploadOnCloudinary(videoFileLocalPath); // upload to cloudinary
     const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
     if (!videoFile?.url) {
@@ -156,7 +158,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Could not upload video thumbnail. Please try again later");
     }
 
-    const video = await Video.create({
+    const video = await Video.create({  // create video document in db
         title: title.trim(),
         description: description.trim(),
         videoFiles: videoFile.url,
@@ -165,9 +167,9 @@ const publishAVideo = asyncHandler(async (req, res) => {
         owner: req.user._id,
         isPublished: true,
     });
-    const createVideo = await Video.findById(video?._id).populate('owner',
+    const createVideo = await Video.findById(video?._id).populate('owner', // populate owner details
         'username fullName avatar'
-    ).select('-__v');
+    ).select('-__v'); // exclude __v field
 
     return res.status(201).json(new ApiResponse(createVideo, 201, "Video published successfully"));
 
@@ -219,7 +221,7 @@ const getVideoById = asyncHandler(async (req, res) => {
             {
                 $addToSet: { watchHistory: video._id }
             }, { new: true }
-        );
+        );  // addToSet ensures no duplicates
     }
 
     return res.status(200).json(new ApiResponse(video, 200, "Video fetched successfully"));
@@ -244,7 +246,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
-    const { videoId } = req.params;
+    const { videoId } = req.params; // video ID from params
     const { title, description } = req.body;
     //TODO: update video details like title, description, thumbnail
     if (!isValidObjectId(videoId)) {
@@ -265,16 +267,16 @@ const updateVideo = asyncHandler(async (req, res) => {
     }
 
     const updateFields = {};
-    if (title) updateFields.title = title.trim();
-    if (description) updateFields.description = description.trim();
+    if (title) updateFields.title = title.trim();  // update title if provided
+    if (description) updateFields.description = description.trim(); // update description if provided
 
-    const thumbnailLocalPath = req.file?.path;
+    const thumbnailLocalPath = req.file?.path;  // thumbnail file from multer
     if (thumbnailLocalPath) {
         const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
         if (!thumbnail?.url) {
             throw new ApiError(500, "Could not upload video thumbnail. Please try again later");
         }
-        updateFields.thumbnail = thumbnail.url;
+        updateFields.thumbnail = thumbnail.url; // update thumbnail if uploaded
 
     }
 
@@ -283,7 +285,7 @@ const updateVideo = asyncHandler(async (req, res) => {
         {
             $set: updateFields
         }, { new: true }
-    ).populate('owner', 'username fullName avatar').select('-__v');
+    ).populate('owner', 'username fullName avatar').select('-__v');  // populate owner details and exclude __v field
 
     return res.status(200).json(
         new ApiResponse(
@@ -357,11 +359,11 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         throw new ApiError(403, "You are not authorized to update this video");
     }
 
-    const updatedVideo = await Video.findByIdAndUpdate(
+    const updatedVideo = await Video.findByIdAndUpdate(    // toggle isPublished status
         videoId,
-        { $set: { isPublished: !video.isPublished } },
+        { $set: { isPublished: !video.isPublished } }, // toggle the isPublished status
         { new: true }
-    ).populate('owner', 'username fullName avatar').select('-__v');
+    ).populate('owner', 'username fullName avatar').select('-__v'); 
 
     const statusMessage = updatedVideo.isPublished ? "Video is now published" : "Video is now unpublished";
 

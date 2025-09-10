@@ -59,8 +59,41 @@ const registerUser = asyncHandler(async (req, res) => {
   // Normalize keys (trim accidental leading/trailing spaces like ' password') and trim string values
   const normalizedBody = Object.fromEntries(
     Object.entries(req.body).map(([k, v]) => [k.trim(), typeof v === 'string' ? v.trim() : v])
-  );
+  ); // This code normalizes form data to fix common input issues. Here's what it does
+
+  // Input: { ' password': 'mypass ', email: ' user@test.com' }
+// Output: [['password', 'mypass '], ['email', ' user@test.com']]
+
+   /*
+   .map(([k, v]) => ...) - Transforms each [key, value] pair
+
+k = key (field name)
+v = value (field data)
+
+'mypass ' → 'mypass'        // string gets trimmed
+123 → 123                   // number stays unchanged
+null → null                 // null stays unchanged
+//
+[['password', 'mypass'], ['email', 'user@test.com']]
+→ { password: 'mypass', email: 'user@test.com' }
+// Before normalization
+req.body = {
+  ' password': 'mypass ',
+  'email ': ' user@test.com',
+  ' username': 'john123 '
+}
+
+// After normalization
+normalizedBody = {
+  'password': 'mypass',
+  'email': 'user@test.com',
+  'username': 'john123'
+}
+  Why this matters: Without this, req.body[' password'] would be undefined when you try to access req.body.password, causing "password is required" errors even when the user provided it!*/
   // console.log('Normalized register body:', normalizedBody);
+
+
+
   const { username, email, fullName, password } = normalizedBody;
   // Basic presence + non-empty string check
   if ([username, email, fullName, password].some(f => typeof f !== 'string' || f.trim() === '')) {
@@ -83,7 +116,7 @@ const registerUser = asyncHandler(async (req, res) => {
   // console.log(req.files);
 
 
-  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const avatarLocalPath = req.files?.avatar?.[0]?.path; // get path of uploaded avatar file
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
   if (!avatarLocalPath) {
@@ -195,7 +228,7 @@ const logOutUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax'
-  };
+  };   // sameSite: 'lax' protects against CSRF by not sending cookies on most cross-site requests, but still works for normal navigation (like clicking links).
 
   return res
     .status(200)
