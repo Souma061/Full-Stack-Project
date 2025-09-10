@@ -4,14 +4,22 @@ import {
     deleteComment,
     getVideoComments,
     updateComment,
-} from "../controllers/comment.controller.js"
-import {verifyJWT} from "../middlewares/auth.middleware.js"
+} from '../controllers/comment.controller.js';
+import { verifyJWT } from '../middlewares/auth.middleware.js';
 
-const router = Router();
+// mergeParams true so we can access :videoId from the parent mounted route
+const router = Router({ mergeParams: true });
 
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+// Public: list comments for a video (expects parent route to provide :videoId)
+router.get('/', getVideoComments);
 
-router.route("/:videoId").get(getVideoComments).post(addComment);
-router.route("/c/:commentId").delete(deleteComment).patch(updateComment);
+// Auth required: create a new comment
+router.post('/', verifyJWT, addComment);
 
-export default router
+// Auth required: update own comment
+router.patch('/:commentId', verifyJWT, updateComment);
+
+// Auth required: delete own comment
+router.delete('/:commentId', verifyJWT, deleteComment);
+
+export default router;
