@@ -718,6 +718,137 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 ---
 
+## 📊 Dashboard Routes
+
+### Get Channel Stats
+```
+GET /api/v1/dashboard/stats
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Get comprehensive channel analytics
+// Returns total videos, views, subscribers, likes
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "totalVideos": 15,
+    "totalViews": 25000,
+    "totalLikes": 350,
+    "totalSubscribers": 1200
+  },
+  "message": "Channel stats fetched successfully",
+  "success": true
+}
+```
+
+### Get Channel Videos with Analytics
+```
+GET /api/v1/dashboard/videos?page=1&limit=10&sortBy=views&sortType=desc
+Authorization: Bearer <ACCESS_TOKEN>
+
+Query Params:
+- page: Page number (default: 1)
+- limit: Videos per page (default: 10, max: 50)
+- sortBy: Sort field - "createdAt", "views", "likesCount", "title" (default: "createdAt")
+- sortType: Sort order - "asc", "desc" (default: "desc")
+
+// Get channel's videos with detailed analytics
+// Includes likes count, comments count for each video
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "videos": [
+      {
+        "_id": "68c1739712e714aed4e04a56",
+        "title": "Amazing Tutorial",
+        "description": "Learn programming basics",
+        "thumbnail": "https://res.cloudinary.com/...",
+        "videoFile": "https://res.cloudinary.com/...",
+        "duration": 120.5,
+        "views": 5000,
+        "isPublished": true,
+        "createdAt": "2025-09-11T10:30:00.000Z",
+        "updatedAt": "2025-09-11T12:30:00.000Z",
+        "likesCount": 150,
+        "commentsCount": 25
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 15,
+      "totalPages": 2,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    },
+    "sortInfo": {
+      "sortBy": "views",
+      "sortType": "desc"
+    }
+  },
+  "message": "Channel videos fetched successfully",
+  "success": true
+}
+```
+
+---
+
+## 🔍 Healthcheck Routes
+
+### Server Health Check
+```
+GET /api/v1/healthcheck
+// No authentication required - Public endpoint for monitoring
+
+// Returns comprehensive server status information
+// Used by load balancers, monitoring tools, and CI/CD pipelines
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "status": "OK",
+    "message": "Server is running smoothly",
+    "timestamp": "2025-09-11T15:30:45.123Z",
+    "uptime": 3600,
+    "environment": "development",
+    "version": "1.0.0",
+    "services": {
+      "database": {
+        "status": "Connected",
+        "type": "MongoDB",
+        "version": "8.0.0"
+      },
+      "server": {
+        "status": "Running",
+        "port": 8000,
+        "host": "localhost"
+      }
+    }
+  },
+  "message": "Healthcheck data fetched successfully",
+  "success": true
+}
+```
+
+**Use Cases:**
+- **Load Balancer Health Checks** - AWS ELB, NGINX upstream monitoring
+- **Container Orchestration** - Docker health checks, Kubernetes probes
+- **Monitoring Systems** - New Relic, DataDog, Pingdom integration
+- **CI/CD Validation** - GitHub Actions, Jenkins deployment verification
+- **Development Debugging** - Quick server status verification
+
+---
+
 ## �🚀 Quick Test Sequence
 
 1. **Register a user** → Get access token from login
@@ -960,89 +1091,107 @@ GET /api/v1/videos?query=tutorial&sortBy=createdAt&sortType=desc&page=1&limit=10
 
 ### 🎯 Complete API Test Flow
 ```json
-// 1. Register User
+// 1. Health Check (No auth required)
+GET /api/v1/healthcheck
+→ Response: status: "OK", uptime, services status
+
+// 2. Register User
 POST /api/v1/users/register
 Form-data: {fullName, username, email, password, avatar, coverImage}
 
-// 2. Login & Get Token
+// 3. Login & Get Token
 POST /api/v1/users/login
 Body: {"email": "johndoe@example.com", "password": "SecurePass123!"}
 → Copy accessToken from response
 
-// 3. Upload Video
+// 4. Upload Video
 POST /api/v1/videos
 Headers: Authorization: Bearer <token>
 Form-data: {title, description, videoFile, thumbnail}
 → Copy video _id from response
 
-// 4. Get All Videos
+// 5. Get All Videos
 GET /api/v1/videos
 
-// 5. Get Specific Video
+// 6. Get Specific Video
 GET /api/v1/videos/68c1739712e714aed4e04a56
 
-// 6. Add Comment
+// 7. Add Comment
 POST /api/v1/videos/68c1739712e714aed4e04a56/comments
 Headers: Authorization: Bearer <token>
 Body: {"content": "Great video!"}
 
-// 7. Update Video
+// 8. Update Video
 PATCH /api/v1/videos/68c1739712e714aed4e04a56
 Headers: Authorization: Bearer <token>
 Body: {"title": "Updated Title"}
 
-// 8. Get User Profile
+// 9. Get User Profile
 GET /api/v1/users/channel/johndoe123
 Headers: Authorization: Bearer <token>
 
-// 9. Subscribe to a Channel
+// 10. Subscribe to a Channel
 POST /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437
 Headers: Authorization: Bearer <token>
 → Response: isSubscribed: true, subscriberCount: 1
 
-// 10. Get Channel Subscribers
+// 11. Get Channel Subscribers
 GET /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437?page=1&limit=10
 Headers: Authorization: Bearer <token>
 
-// 11. Get User's Subscribed Channels
+// 12. Get User's Subscribed Channels
 GET /api/v1/subscriptions/u/68c1739712e714aed4e04a56?page=1&limit=10
 Headers: Authorization: Bearer <token>
 
-// 12. Unsubscribe from Channel
+// 13. Unsubscribe from Channel
 POST /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437
 Headers: Authorization: Bearer <token>
 → Response: isSubscribed: false, subscriberCount: 0
 
-// 13. Create Playlist
+// 14. Create Playlist
 POST /api/v1/playlists
 Headers: Authorization: Bearer <token>
 Body: {"name": "My Favorites", "description": "Best videos ever"}
 → Copy playlist _id from response
 
-// 14. Add Video to Playlist
+// 15. Add Video to Playlist
 PATCH /api/v1/playlists/add/68c1739712e714aed4e04a56/{PLAYLIST_ID}
 Headers: Authorization: Bearer <token>
 → Response: Video added to playlist successfully
 
-// 15. Get Playlist Details
+// 16. Get Playlist Details
 GET /api/v1/playlists/{PLAYLIST_ID}?page=1&limit=10
 Headers: Authorization: Bearer <token>
 
-// 16. Get User's Playlists
+// 17. Get User's Playlists
 GET /api/v1/playlists/user/68c1739712e714aed4e04a56
 Headers: Authorization: Bearer <token>
 
-// 17. Remove Video from Playlist
+// 18. Remove Video from Playlist
 PATCH /api/v1/playlists/remove/68c1739712e714aed4e04a56/{PLAYLIST_ID}
 Headers: Authorization: Bearer <token>
 
-// 18. Update Playlist
+// 19. Update Playlist
 PATCH /api/v1/playlists/{PLAYLIST_ID}
 Headers: Authorization: Bearer <token>
 Body: {"name": "Updated Playlist Name"}
 
-// 19. Delete Playlist
+// 20. Delete Playlist
 DELETE /api/v1/playlists/{PLAYLIST_ID}
+Headers: Authorization: Bearer <token>
+
+// 21. Get Channel Stats
+GET /api/v1/dashboard/stats
+Headers: Authorization: Bearer <token>
+→ Response: totalVideos, totalViews, totalSubscribers, totalLikes
+
+// 22. Get Channel Videos with Analytics (sorted by views)
+GET /api/v1/dashboard/videos?page=1&limit=10&sortBy=views&sortType=desc
+Headers: Authorization: Bearer <token>
+→ Response: videos with likesCount, commentsCount for each
+
+// 23. Get Channel Videos (sorted by date)
+GET /api/v1/dashboard/videos?sortBy=createdAt&sortType=desc
 Headers: Authorization: Bearer <token>
 ```
 
@@ -1062,7 +1211,13 @@ Headers: Authorization: Bearer <token>
    - After registration: userId = pm.response.json().data.user._id
    - After playlist creation: playlistId = pm.response.json().data._id
 
-3. Test error cases:
+3. Test dashboard analytics flow:
+   - Upload multiple videos first
+   - Get some likes and comments
+   - Then test dashboard/stats endpoint
+   - Sort videos by different criteria (views, likes, date)
+
+4. Test error cases:
    - Invalid tokens
    - Missing required fields
    - Unauthorized access
@@ -1070,4 +1225,5 @@ Headers: Authorization: Bearer <token>
    - Self-subscription attempts
    - Adding unpublished videos to playlists
    - Modifying others' playlists
+   - Invalid sort parameters
 ```
