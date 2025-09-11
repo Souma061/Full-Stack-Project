@@ -3,7 +3,7 @@ import { Subscription } from "../models/subscription.model.js";
 import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/apierror.js";
 import { ApiResponse } from "../utils/Apiresponse.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 
 
 const toggleSubscription = asyncHandler(async (req, res) => {
@@ -19,13 +19,13 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
     // prevent user from subscribing to himself
 
-    if (channelId.toString() === req.user?._id.toString()) {
+    if (channelId.toString() === req.user._id.toString()) {
         throw new ApiError(400, "You cannot subscribe to yourself");
     }
 
     const existingSubscription = await Subscription.findOne({
         channel: channelId,
-        subscriber: req.user?._id
+        subscriber: req.user._id
     });
 
     let message;
@@ -38,7 +38,7 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     } else {
         await Subscription.create({
             channel: channelId,
-            subscriber: req.user?._id
+            subscriber: req.user._id
         });
         isSubscribed = true;
         message = "Subscribed successfully";
@@ -121,7 +121,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     ///get subscriber list with user details
 
     const subscriptions = await Subscription.find({
-        channel: subscriberId
+        subscriber: subscriberId
     }).populate({
         path: "channel",
         select: "username fullName avatar"

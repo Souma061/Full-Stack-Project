@@ -25,7 +25,21 @@ Form Data:
 - coverImage: [image file]
 - fullName: "John Doe"
 - username: "johndoe123"
-- email: "johndoe@example.com"
+- emai## 🚀 Quick Test Sequence
+
+1. **Register a user** → Get access token from login
+2. **Upload a video** → Get video ID
+3. **Get all videos** → Verify your video appears
+4. **Add a comment** → Test comment functionality
+5. **Like the video** → Test like system
+6. **Get liked videos** → Verify like appears in list
+7. **Subscribe to channel** → Test subscription functionality
+8. **Get channel subscribers** → Verify subscription appears
+9. **Get subscribed channels** → Test user's subscriptions
+10. **Unsubscribe from channel** → Test unsubscribe functionality
+11. **Unlike the video** → Test unlike functionality
+12. **Update video** → Change title/description
+13. **Toggle publish** → Test visibility control@example.com"
 - password: "SecurePass123!"
 ```
 
@@ -335,7 +349,116 @@ Query Params:
 
 ---
 
-## 🚀 Quick Test Sequence
+## � Subscription Routes
+
+### Toggle Subscription (Subscribe/Unsubscribe)
+```
+POST /api/v1/subscriptions/c/:channelId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Toggles subscription status to a channel (user)
+// If subscribed: unsubscribes, if not subscribed: subscribes
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "isSubscribed": true,
+    "subscriberCount": 25,
+    "channelInfo": {
+      "channelId": "68c1739712e714aed4e04a56",
+      "channelName": "John Doe",
+      "username": "johndoe123"
+    }
+  },
+  "message": "Subscribed successfully",
+  "success": true
+}
+```
+
+### Get Channel Subscribers
+```
+GET /api/v1/subscriptions/c/:channelId?page=1&limit=10
+Authorization: Bearer <ACCESS_TOKEN>
+
+Query Params:
+- page: Page number (default: 1)
+- limit: Items per page (default: 10, max: 50)
+
+// Get list of users who subscribed to this channel
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "subscribers": [
+      {
+        "_id": "68c1739712e714aed4e04a56",
+        "username": "subscriber1",
+        "fullName": "Subscriber One",
+        "avatar": "https://res.cloudinary.com/..."
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 25,
+      "totalPages": 3,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  },
+  "message": "Subscribers fetched successfully",
+  "success": true
+}
+```
+
+### Get User's Subscribed Channels
+```
+GET /api/v1/subscriptions/u/:subscriberId?page=1&limit=10
+Authorization: Bearer <ACCESS_TOKEN>
+
+Query Params:
+- page: Page number (default: 1)
+- limit: Items per page (default: 10, max: 50)
+
+// Get list of channels this user has subscribed to
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "channels": [
+      {
+        "_id": "68c1739712e714aed4e04a56",
+        "username": "channelowner1",
+        "fullName": "Channel Owner",
+        "avatar": "https://res.cloudinary.com/..."
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 10,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  },
+  "message": "Subscribed channels fetched successfully",
+  "success": true
+}
+```
+
+---
+
+## �🚀 Quick Test Sequence
 
 1. **Register a user** → Get access token from login
 2. **Upload a video** → Get video ID
@@ -611,6 +734,24 @@ Body: {"title": "Updated Title"}
 // 8. Get User Profile
 GET /api/v1/users/channel/johndoe123
 Headers: Authorization: Bearer <token>
+
+// 9. Subscribe to a Channel
+POST /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437
+Headers: Authorization: Bearer <token>
+→ Response: isSubscribed: true, subscriberCount: 1
+
+// 10. Get Channel Subscribers
+GET /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437?page=1&limit=10
+Headers: Authorization: Bearer <token>
+
+// 11. Get User's Subscribed Channels
+GET /api/v1/subscriptions/u/68c1739712e714aed4e04a56?page=1&limit=10
+Headers: Authorization: Bearer <token>
+
+// 12. Unsubscribe from Channel
+POST /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437
+Headers: Authorization: Bearer <token>
+→ Response: isSubscribed: false, subscriberCount: 0
 ```
 
 ### 🌟 Pro Testing Tips
@@ -619,14 +760,18 @@ Headers: Authorization: Bearer <token>
    - {{baseUrl}} = http://localhost:8000
    - {{token}} = <your_access_token>
    - {{videoId}} = <your_video_id>
+   - {{channelId}} = <channel_user_id>
+   - {{subscriberId}} = <subscriber_user_id>
 
 2. Save responses to extract IDs:
    - After login: token = pm.response.json().data.accessToken
    - After upload: videoId = pm.response.json().data._id
+   - After registration: userId = pm.response.json().data.user._id
 
 3. Test error cases:
    - Invalid tokens
    - Missing required fields
    - Unauthorized access
    - Non-existent IDs
+   - Self-subscription attempts
 ```
