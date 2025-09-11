@@ -35,11 +35,16 @@ Form Data:
 6. **Get liked videos** → Verify like appears in list
 7. **Subscribe to channel** → Test subscription functionality
 8. **Get channel subscribers** → Verify subscription appears
-9. **Get subscribed channels** → Test user's subscriptions
-10. **Unsubscribe from channel** → Test unsubscribe functionality
-11. **Unlike the video** → Test unlike functionality
-12. **Update video** → Change title/description
-13. **Toggle publish** → Test visibility control@example.com"
+9. **Create playlist** → Test playlist creation
+10. **Add video to playlist** → Test video management in playlists
+11. **Get playlist details** → Test playlist retrieval with videos
+12. **Remove video from playlist** → Test video removal
+13. **Update playlist** → Change name/description
+14. **Delete playlist** → Test playlist deletion
+15. **Unlike the video** → Test unlike functionality
+16. **Unsubscribe from channel** → Test unsubscribe functionality
+17. **Update video** → Change title/description
+18. **Toggle publish** → Test visibility control@example.com"
 - password: "SecurePass123!"
 ```
 
@@ -458,6 +463,261 @@ Query Params:
 
 ---
 
+## 📋 Playlist Routes
+
+### Create Playlist
+```
+POST /api/v1/playlists
+Authorization: Bearer <ACCESS_TOKEN>
+Content-Type: application/json
+
+Body:
+{
+  "name": "My Favorite Videos",
+  "description": "Collection of my most watched videos"
+}
+```
+
+**Response:**
+```json
+{
+  "statusCode": 201,
+  "data": {
+    "_id": "64f1234567890abcdef12345",
+    "name": "My Favorite Videos",
+    "description": "Collection of my most watched videos",
+    "owner": "64f1234567890abcdef67890",
+    "videos": [],
+    "createdAt": "2025-09-11T10:30:00.000Z",
+    "updatedAt": "2025-09-11T10:30:00.000Z"
+  },
+  "message": "Playlist created successfully",
+  "success": true
+}
+```
+
+### Get Playlist by ID
+```
+GET /api/v1/playlists/:playlistId?page=1&limit=10
+Authorization: Bearer <ACCESS_TOKEN>
+
+Query Params:
+- page: Page number for videos (default: 1)
+- limit: Videos per page (default: 10, max: 50)
+
+// Returns playlist info + paginated videos
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "playlist": {
+      "_id": "64f1234567890abcdef12345",
+      "name": "My Favorite Videos",
+      "description": "Collection of my most watched videos",
+      "owner": {
+        "username": "johndoe123",
+        "fullName": "John Doe",
+        "avatar": "https://res.cloudinary.com/..."
+      },
+      "createdAt": "2025-09-11T10:30:00.000Z",
+      "updatedAt": "2025-09-11T10:30:00.000Z",
+      "totalVideos": 15
+    },
+    "videos": [
+      {
+        "_id": "68c1739712e714aed4e04a56",
+        "title": "Amazing Tutorial",
+        "description": "Learn programming basics",
+        "videoFiles": "https://res.cloudinary.com/...",
+        "thumbnail": "https://res.cloudinary.com/...",
+        "duration": 120.5,
+        "views": 1500,
+        "owner": {
+          "username": "creator123",
+          "fullName": "Content Creator",
+          "avatar": "https://res.cloudinary.com/..."
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 15,
+      "totalPages": 2,
+      "hasNextPage": true,
+      "hasPrevPage": false
+    }
+  },
+  "message": "Playlist fetched successfully",
+  "success": true
+}
+```
+
+### Get User's Playlists
+```
+GET /api/v1/playlists/user/:userId?page=1&limit=10
+Authorization: Bearer <ACCESS_TOKEN>
+
+Query Params:
+- page: Page number (default: 1)
+- limit: Playlists per page (default: 10, max: 50)
+
+// Get all playlists created by a specific user
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "playlists": [
+      {
+        "_id": "64f1234567890abcdef12345",
+        "name": "My Favorite Videos",
+        "description": "Collection of my most watched videos",
+        "owner": {
+          "username": "johndoe123",
+          "fullName": "John Doe",
+          "avatar": "https://res.cloudinary.com/..."
+        },
+        "videos": ["video1", "video2", "video3"],
+        "videoCount": 3,
+        "createdAt": "2025-09-11T10:30:00.000Z"
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 5,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  },
+  "message": "Playlists fetched successfully",
+  "success": true
+}
+```
+
+### Update Playlist
+```
+PATCH /api/v1/playlists/:playlistId
+Authorization: Bearer <ACCESS_TOKEN>
+Content-Type: application/json
+
+Body:
+{
+  "name": "Updated Playlist Name",
+  "description": "Updated description"
+}
+
+// Only playlist owner can update
+// Either name or description can be updated
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "_id": "64f1234567890abcdef12345",
+    "name": "Updated Playlist Name",
+    "description": "Updated description",
+    "owner": {
+      "username": "johndoe123",
+      "fullName": "John Doe",
+      "avatar": "https://res.cloudinary.com/..."
+    },
+    "videos": ["video1", "video2"],
+    "createdAt": "2025-09-11T10:30:00.000Z",
+    "updatedAt": "2025-09-11T12:30:00.000Z"
+  },
+  "message": "Playlist updated successfully",
+  "success": true
+}
+```
+
+### Add Video to Playlist
+```
+PATCH /api/v1/playlists/add/:videoId/:playlistId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Adds a video to the playlist
+// Only playlist owner can add videos
+// Only published videos can be added
+// Prevents duplicate videos
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "playlist": {
+      "_id": "64f1234567890abcdef12345",
+      "name": "My Favorite Videos",
+      "videos": ["video1", "video2", "newVideoId"],
+      "owner": "64f1234567890abcdef67890"
+    },
+    "addedVideo": {
+      "_id": "newVideoId",
+      "title": "New Video Title",
+      "isPublished": true
+    }
+  },
+  "message": "Video added to playlist successfully",
+  "success": true
+}
+```
+
+### Remove Video from Playlist
+```
+PATCH /api/v1/playlists/remove/:videoId/:playlistId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Removes a video from the playlist
+// Only playlist owner can remove videos
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "_id": "64f1234567890abcdef12345",
+    "name": "My Favorite Videos",
+    "videos": ["video1", "video2"],
+    "owner": "64f1234567890abcdef67890"
+  },
+  "message": "Video removed from playlist successfully",
+  "success": true
+}
+```
+
+### Delete Playlist
+```
+DELETE /api/v1/playlists/:playlistId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Deletes the entire playlist
+// Only playlist owner can delete
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {},
+  "message": "Playlist deleted successfully",
+  "success": true
+}
+```
+
+---
+
 ## �🚀 Quick Test Sequence
 
 1. **Register a user** → Get access token from login
@@ -752,6 +1012,38 @@ Headers: Authorization: Bearer <token>
 POST /api/v1/subscriptions/c/68c16ecad235b2c4c3f82437
 Headers: Authorization: Bearer <token>
 → Response: isSubscribed: false, subscriberCount: 0
+
+// 13. Create Playlist
+POST /api/v1/playlists
+Headers: Authorization: Bearer <token>
+Body: {"name": "My Favorites", "description": "Best videos ever"}
+→ Copy playlist _id from response
+
+// 14. Add Video to Playlist
+PATCH /api/v1/playlists/add/68c1739712e714aed4e04a56/{PLAYLIST_ID}
+Headers: Authorization: Bearer <token>
+→ Response: Video added to playlist successfully
+
+// 15. Get Playlist Details
+GET /api/v1/playlists/{PLAYLIST_ID}?page=1&limit=10
+Headers: Authorization: Bearer <token>
+
+// 16. Get User's Playlists
+GET /api/v1/playlists/user/68c1739712e714aed4e04a56
+Headers: Authorization: Bearer <token>
+
+// 17. Remove Video from Playlist
+PATCH /api/v1/playlists/remove/68c1739712e714aed4e04a56/{PLAYLIST_ID}
+Headers: Authorization: Bearer <token>
+
+// 18. Update Playlist
+PATCH /api/v1/playlists/{PLAYLIST_ID}
+Headers: Authorization: Bearer <token>
+Body: {"name": "Updated Playlist Name"}
+
+// 19. Delete Playlist
+DELETE /api/v1/playlists/{PLAYLIST_ID}
+Headers: Authorization: Bearer <token>
 ```
 
 ### 🌟 Pro Testing Tips
@@ -762,11 +1054,13 @@ Headers: Authorization: Bearer <token>
    - {{videoId}} = <your_video_id>
    - {{channelId}} = <channel_user_id>
    - {{subscriberId}} = <subscriber_user_id>
+   - {{playlistId}} = <your_playlist_id>
 
 2. Save responses to extract IDs:
    - After login: token = pm.response.json().data.accessToken
    - After upload: videoId = pm.response.json().data._id
    - After registration: userId = pm.response.json().data.user._id
+   - After playlist creation: playlistId = pm.response.json().data._id
 
 3. Test error cases:
    - Invalid tokens
@@ -774,4 +1068,6 @@ Headers: Authorization: Bearer <token>
    - Unauthorized access
    - Non-existent IDs
    - Self-subscription attempts
+   - Adding unpublished videos to playlists
+   - Modifying others' playlists
 ```
