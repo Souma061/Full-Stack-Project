@@ -235,14 +235,117 @@ Authorization: Bearer <ACCESS_TOKEN>
 
 ---
 
+## ❤️ Like System Routes
+
+### Toggle Video Like
+```
+POST /api/v1/likes/toggle/v/:videoId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Toggles like status (if liked -> unlike, if not liked -> like)
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "isLiked": true,
+    "totalLikes": 15
+  },
+  "message": "Video liked successfully",
+  "success": true
+}
+```
+
+### Toggle Comment Like
+```
+POST /api/v1/likes/toggle/c/:commentId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Toggles like status for a comment
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "isLiked": false,
+    "totalLikes": 3
+  },
+  "message": "Comment unliked successfully",
+  "success": true
+}
+```
+
+### Toggle Tweet Like
+```
+POST /api/v1/likes/toggle/t/:tweetId
+Authorization: Bearer <ACCESS_TOKEN>
+
+// Toggles like status for a tweet (if tweet system implemented)
+```
+
+### Get User's Liked Videos
+```
+GET /api/v1/likes/videos?page=1&limit=10
+Authorization: Bearer <ACCESS_TOKEN>
+
+Query Params:
+- page: Page number (default: 1)
+- limit: Items per page (default: 10, max: 50)
+```
+
+**Response:**
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "videos": [
+      {
+        "_id": "68c1739712e714aed4e04a56",
+        "title": "Amazing Tutorial",
+        "description": "Learn programming basics",
+        "videoFiles": "https://res.cloudinary.com/...",
+        "thumbnail": "https://res.cloudinary.com/...",
+        "duration": 120.5,
+        "views": 1500,
+        "createdAt": "2025-09-10T12:48:23.526Z",
+        "owner": {
+          "username": "johndoe123",
+          "fullName": "John Doe",
+          "avatar": "https://res.cloudinary.com/..."
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "limit": 10,
+      "totalDocs": 5,
+      "totalPages": 1,
+      "hasNextPage": false,
+      "hasPrevPage": false
+    }
+  },
+  "message": "Liked videos fetched successfully",
+  "success": true
+}
+```
+
+---
+
 ## 🚀 Quick Test Sequence
 
 1. **Register a user** → Get access token from login
 2. **Upload a video** → Get video ID
 3. **Get all videos** → Verify your video appears
 4. **Add a comment** → Test comment functionality
-5. **Update video** → Change title/description
-6. **Toggle publish** → Test visibility control
+5. **Like the video** → Test like system
+6. **Get liked videos** → Verify like appears in list
+7. **Unlike the video** → Test unlike functionality
+8. **Update video** → Change title/description
+9. **Toggle publish** → Test visibility control
 
 ---
 
@@ -370,6 +473,75 @@ Sample 3 - Cooking Show:
 {
   "content": "At 10:45, wouldn't it be better to use Promise.all() instead of sequential awaits for better performance?"
 }
+```
+
+### ❤️ Like System Testing Examples
+```json
+// Like a video response
+{
+  "statusCode": 200,
+  "data": {
+    "isLiked": true,
+    "totalLikes": 1
+  },
+  "message": "Video liked successfully",
+  "success": true
+}
+
+// Unlike a video response
+{
+  "statusCode": 200,
+  "data": {
+    "isLiked": false,
+    "totalLikes": 0
+  },
+  "message": "Video unliked successfully",
+  "success": true
+}
+
+// Like a comment response
+{
+  "statusCode": 200,
+  "data": {
+    "isLiked": true,
+    "totalLikes": 5
+  },
+  "message": "Comment liked successfully",
+  "success": true
+}
+```
+
+### 🔥 Like System Demo Test Sequence
+```bash
+# 1. Like a video (POST)
+POST /api/v1/likes/toggle/v/68c1739712e714aed4e04a56
+Headers: Authorization: Bearer <token>
+→ Response: isLiked: true, totalLikes: 1
+
+# 2. Unlike same video (POST again)
+POST /api/v1/likes/toggle/v/68c1739712e714aed4e04a56
+Headers: Authorization: Bearer <token>
+→ Response: isLiked: false, totalLikes: 0
+
+# 3. Like video again (POST again)
+POST /api/v1/likes/toggle/v/68c1739712e714aed4e04a56
+Headers: Authorization: Bearer <token>
+→ Response: isLiked: true, totalLikes: 1
+
+# 4. Get all liked videos (GET)
+GET /api/v1/likes/videos?page=1&limit=10
+Headers: Authorization: Bearer <token>
+→ Response: Array with the liked video + pagination data
+
+# 5. Add a comment first
+POST /api/v1/videos/68c1739712e714aed4e04a56/comments
+Body: {"content": "Amazing video! 🔥"}
+→ Copy comment _id from response
+
+# 6. Like the comment
+POST /api/v1/likes/toggle/c/<COMMENT_ID>
+Headers: Authorization: Bearer <token>
+→ Response: isLiked: true, totalLikes: 1
 ```
 
 ### 📊 Query Parameter Examples

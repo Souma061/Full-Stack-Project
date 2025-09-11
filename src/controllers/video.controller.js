@@ -13,7 +13,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     let pageNum = parseInt(page, 10);
     let limitNum = parseInt(limit, 10);
 
-    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
+    if (isNaN(pageNum) || pageNum < 1) pageNum = 1; // default to page 1 if invalid
     if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
     if (limitNum > 50) limitNum = 50; // hard cap
 
@@ -363,7 +363,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
         videoId,
         { $set: { isPublished: !video.isPublished } }, // toggle the isPublished status
         { new: true }
-    ).populate('owner', 'username fullName avatar').select('-__v'); 
+    ).populate('owner', 'username fullName avatar').select('-__v');
 
     const statusMessage = updatedVideo.isPublished ? "Video is now published" : "Video is now unpublished";
 
