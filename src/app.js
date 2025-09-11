@@ -25,6 +25,7 @@ app.get('/health', (req, res) => {
 
 // routes
 import commentRouter from './routes/comment.routes.js';
+import dashboardRouter from './routes/dashboard.routes.js';
 import likeRouter from './routes/like.routes.js';
 import playlistRouter from './routes/playlist.routes.js';
 import subscriptionRouter from './routes/subscription.routes.js';
@@ -38,6 +39,7 @@ app.use('/api/v1/videos/:videoId/comments', commentRouter);
 app.use('/api/v1/likes', likeRouter);
 app.use('/api/v1/playlists', playlistRouter);
 app.use('/api/v1/subscriptions', subscriptionRouter);
+app.use('/api/v1/dashboard', dashboardRouter);
 
 export { app };
 
