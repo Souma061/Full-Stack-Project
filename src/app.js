@@ -14,6 +14,15 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
 
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'API is running!',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
 // routes
 import commentRouter from './routes/comment.routes.js';
 import userRouter from './routes/user.routes.js';
