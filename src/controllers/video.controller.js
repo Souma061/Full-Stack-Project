@@ -51,9 +51,9 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
     },
     { $unwind: "$owner" }, // unwind : deconstructs the array field from the input documents to output a document for each element
-  { $sort: sortOptions },
-  { $skip: skip },
-  { $limit: limit },
+    { $sort: sortOptions },
+    { $skip: skip },
+    { $limit: limit },
     {
       $project: {
         // project only necessary fields

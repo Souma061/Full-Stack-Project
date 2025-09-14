@@ -30,8 +30,8 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
   })
     .populate("owner", "username fullName avatar")
     .sort({ createdAt: -1 })
-  .skip(skip)
-  .limit(limit);
+    .skip(skip)
+    .limit(limit);
 
   const playlistsWithCount = playlists.map((playlist) => {
     const videoCount = playlist.videos.length;
