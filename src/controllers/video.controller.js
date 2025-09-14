@@ -7,19 +7,11 @@ import { asyncHandler } from "../utils/asynchandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
-  //TODO: get all videos based on query, sort, pagination
-  let pageNum = parseInt(page, 10);
-  let limitNum = parseInt(limit, 10);
+  // Zod validated via VideoListQuery in routes
+  const { page = 1, limit = 20, query, sortBy, sortType, userId } = req.query;
 
-  if (isNaN(pageNum) || pageNum < 1) pageNum = 1; // default to page 1 if invalid
-  if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
-  if (limitNum > 50) limitNum = 50; // hard cap
-
-  const filter = {
-    isPublished: true,
-  };
-  if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+  const filter = { isPublished: true };
+  if (userId) {
     filter.owner = new mongoose.Types.ObjectId(userId);
   }
 
@@ -29,24 +21,11 @@ const getAllVideos = asyncHandler(async (req, res) => {
       { description: { $regex: query, $options: "i" } },
     ]; // it does a case-insensitive search in title and description
   }
-  const sortOptions = {}; // Initialize empty sort options
-  if (sortBy) {
-    const validSortFields = [
-      "views",
-      "createdAt",
-      "title",
-      "duration",
-      "createdAt",
-      "updatedAt",
-    ];
-    if (validSortFields.includes(sortBy)) {
-      sortOptions[sortBy] = sortType === "asc" ? 1 : -1;
-    }
-  } else {
-    sortOptions.createdAt = -1; // default sort by createdAt desc
-  } // default sort by createdAt desc
+  const sortOptions = sortBy
+    ? { [sortBy]: sortType === "asc" ? 1 : -1 }
+    : { createdAt: -1 };
 
-  const skip = (pageNum - 1) * limitNum; // Calculate documents to skip
+  const skip = (page - 1) * limit; // Calculate documents to skip
 
   // Using aggregation to join with users collection to get owner details
 
@@ -72,9 +51,9 @@ const getAllVideos = asyncHandler(async (req, res) => {
       },
     },
     { $unwind: "$owner" }, // unwind : deconstructs the array field from the input documents to output a document for each element
-    { $sort: sortOptions }, // sort the results based on sortOptions
-    { $skip: skip }, // skip the first (pageNum - 1) * limitNum documents
-    { $limit: limitNum }, // limit the results to limitNum
+  { $sort: sortOptions },
+  { $skip: skip },
+  { $limit: limit },
     {
       $project: {
         // project only necessary fields
@@ -90,19 +69,19 @@ const getAllVideos = asyncHandler(async (req, res) => {
   ]);
 
   const totalDocs = await Video.countDocuments(filter);
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limitNum)); // Calculate total pages
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limit));
 
   return res.status(200).json(
     new ApiResponse(
       {
         videos,
         pagination: {
-          page: pageNum,
-          limit: limitNum,
+          page,
+          limit,
           totalDocs,
           totalPages,
-          hasNextPage: pageNum < totalPages,
-          hasPrevPage: pageNum > 1,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
         },
       },
       200,

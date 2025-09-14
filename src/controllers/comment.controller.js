@@ -8,8 +8,9 @@ import { asyncHandler } from "../utils/asynchandler.js";
 // GET /api/v1/videos/:videoId/comments?page=1&limit=10
 // Returns paginated comments for a video
 const getVideoComments = asyncHandler(async (req, res) => {
-  const { videoId } = req.params; // validated by Zod
-  const { page = 1, limit = 10 } = req.query; // validated/coerced by Zod
+  // Zod validated by VideoParam and CommentListQuery
+  const { videoId } = req.params;
+  const { page = 1, limit = 20 } = req.query;
 
   const filter = { video: new mongoose.Types.ObjectId(videoId) };
   const totalDocs = await Comment.countDocuments(filter);
@@ -52,8 +53,9 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
 // POST /api/v1/videos/:videoId/comments
 const addComment = asyncHandler(async (req, res) => {
-  const { videoId } = req.params; // validated by Zod
-  const { content } = req.body; // validated by Zod
+  // Zod validated
+  const { videoId } = req.params;
+  const { content } = req.body;
 
   const comment = await Comment.create({
     video: videoId,
@@ -75,8 +77,9 @@ const addComment = asyncHandler(async (req, res) => {
 
 // PATCH /api/v1/videos/comments/:commentId
 const updateComment = asyncHandler(async (req, res) => {
-  const { commentId } = req.params; // validated by Zod
-  const { content } = req.body; // validated by Zod
+  // Zod validated
+  const { commentId } = req.params;
+  const { content } = req.body;
 
   // atomic update ensuring ownership
   const updated = await Comment.findOneAndUpdate(
@@ -103,7 +106,8 @@ const updateComment = asyncHandler(async (req, res) => {
 
 // DELETE /api/v1/videos/comments/:commentId
 const deleteComment = asyncHandler(async (req, res) => {
-  const { commentId } = req.params; // validated by Zod
+  // Zod validated
+  const { commentId } = req.params;
 
   const deleted = await Comment.findOneAndDelete({
     _id: commentId,

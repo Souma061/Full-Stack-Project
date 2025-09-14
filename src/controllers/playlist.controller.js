@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/Apiresponse.js"; // Add this import
 import { asyncHandler } from "../utils/asynchandler.js";
 
 const createPlaylist = asyncHandler(async (req, res) => {
-  const { name, description } = req.body; // validated by Zod
+  const { name, description } = req.body; // Zod validated
 
   const playlist = await Playlist.create({
     name: name.trim(),
@@ -21,22 +21,17 @@ const createPlaylist = asyncHandler(async (req, res) => {
 });
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
-  const { userId } = req.params; // validated by Zod
-  const { page = 1, limit = 10 } = req.query; // validated/coerced by Zod
-  //TODO: get user playlists
-
-  let pageNum = parseInt(page, 10);
-  let limitNum = parseInt(limit, 10);
-
-  const skip = (pageNum - 1) * limitNum;
+  const { userId } = req.params; // Zod validated
+  const { page = 1, limit = 20 } = req.query; // Zod coerced
+  const skip = (page - 1) * limit;
 
   const playlists = await Playlist.find({
     owner: userId,
   })
     .populate("owner", "username fullName avatar")
     .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limitNum);
+  .skip(skip)
+  .limit(limit);
 
   const playlistsWithCount = playlists.map((playlist) => {
     const videoCount = playlist.videos.length;
@@ -49,19 +44,19 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
   const totalPlaylists = await Playlist.countDocuments({
     owner: userId,
   });
-  const totalPages = Math.max(1, Math.ceil(totalPlaylists / limitNum));
+  const totalPages = Math.max(1, Math.ceil(totalPlaylists / limit));
 
   return res.status(200).json(
     new ApiResponse(
       {
         playlists: playlistsWithCount,
         pagination: {
-          page: pageNum,
-          limit: limitNum,
+          page,
+          limit,
           totalDocs: totalPlaylists,
           totalPages,
-          hasNextPage: pageNum < totalPages,
-          hasPrevPage: pageNum > 1,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
         },
       },
       200,
@@ -71,16 +66,9 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 });
 
 const getPlaylistById = asyncHandler(async (req, res) => {
-  const { playlistId } = req.params; // validated by Zod
-  const { page = 1, limit = 10 } = req.query; // validated/coerced by Zod
-  //TODO: get playlist by id
-  let pageNum = parseInt(page, 10);
-  let limitNum = parseInt(limit, 10);
-  if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-  if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
-  if (limitNum > 50) limitNum = 50;
-
-  const skip = (pageNum - 1) * limitNum;
+  const { playlistId } = req.params; // Zod validated
+  const { page = 1, limit = 20 } = req.query; // Zod coerced
+  const skip = (page - 1) * limit;
   const playlist = await Playlist.findById(playlistId)
     .populate("owner", "username fullName avatar")
     .lean();
@@ -98,7 +86,7 @@ const getPlaylistById = asyncHandler(async (req, res) => {
   })
     .populate("owner", "username fullName avatar")
     .lean();
-  const totalPages = Math.max(1, Math.ceil(totalVideos / limitNum));
+  const totalPages = Math.max(1, Math.ceil(totalVideos / limit));
 
   return res.status(200).json(
     new ApiResponse(
@@ -114,12 +102,12 @@ const getPlaylistById = asyncHandler(async (req, res) => {
         },
         videos,
         pagination: {
-          page: pageNum,
-          limit: limitNum,
+          page,
+          limit,
           totalDocs: totalVideos,
           totalPages,
-          hasNextPage: pageNum < totalPages,
-          hasPrevPage: pageNum > 1,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
         },
       },
       200,

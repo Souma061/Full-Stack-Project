@@ -1,4 +1,3 @@
-import { isValidObjectId } from "mongoose";
 import { Subscription } from "../models/subscription.model.js";
 import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/apierror.js";
@@ -7,11 +6,8 @@ import { asyncHandler } from "../utils/asynchandler.js";
 
 
 const toggleSubscription = asyncHandler(async (req, res) => {
-    const { channelId } = req.params;
+    const { channelId } = req.params; // Zod validated
     // TODO: toggle subscription
-    if (!isValidObjectId(channelId)) {
-        throw new ApiError(400, "Invalid channel id");
-    }
     const channel = await User.findById(channelId);
     if (!channel) {
         throw new ApiError(404, "Channel not found");
@@ -61,20 +57,10 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
-    const { channelId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { channelId } = req.params; // Zod validated
+    const { page = 1, limit = 20 } = req.query; // Zod coerced
 
-    if (!isValidObjectId(channelId)) {
-        throw new ApiError(400, "Invalid channel id");
-    }
-
-    let pageNum = parseInt(page, 10);
-    let limitNum = parseInt(limit, 10);
-    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-    if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
-    if (limitNum > 50) limitNum = 50; // hard cap
-
-    const skip = (pageNum - 1) * limitNum;
+    const skip = (page - 1) * limit;
     ///get subscriber list with user details
 
     const subscribers = await Subscription.find({
@@ -82,20 +68,20 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     }).populate({
         path: "subscriber",
         select: "username fullName avatar"
-    }).sort({ createdAt: - 1 }).skip(skip).limit(limitNum).lean();
+    }).sort({ createdAt: - 1 }).skip(skip).limit(limit).lean();
 
     const totalSubscribers = await Subscription.countDocuments({ channel: channelId });
-    const totalPages = Math.max(1, Math.ceil(totalSubscribers / limitNum));
+    const totalPages = Math.max(1, Math.ceil(totalSubscribers / limit));
 
     return res.status(200).json(new ApiResponse({
         subscribers: subscribers.map(sub => sub.subscriber),
         pagination: {
-            page: pageNum,
-            limit: limitNum,
+            page,
+            limit,
             totalDocs: totalSubscribers,
             totalPages,
-            hasNextPage: pageNum < totalPages,
-            hasPrevPage: pageNum > 1
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1
         }
     }, 200, "Subscribers fetched successfully"));
 
@@ -103,21 +89,10 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.params;
-    // const { channelId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { subscriberId } = req.params; // Zod validated
+    const { page = 1, limit = 20 } = req.query; // Zod coerced
 
-    if (!isValidObjectId(subscriberId)) {
-        throw new ApiError(400, "Invalid subscriber id");
-    }
-
-    let pageNum = parseInt(page, 10);
-    let limitNum = parseInt(limit, 10);
-    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-    if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
-    if (limitNum > 50) limitNum = 50; // hard cap
-
-    const skip = (pageNum - 1) * limitNum;
+    const skip = (page - 1) * limit;
     ///get subscriber list with user details
 
     const subscriptions = await Subscription.find({
@@ -125,20 +100,20 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     }).populate({
         path: "channel",
         select: "username fullName avatar"
-    }).sort({ createdAt: - 1 }).skip(skip).limit(limitNum).lean();
+    }).sort({ createdAt: - 1 }).skip(skip).limit(limit).lean();
 
     const totalSubscriptions = await Subscription.countDocuments({ subscriber: subscriberId });
-    const totalPages = Math.max(1, Math.ceil(totalSubscriptions / limitNum));
+    const totalPages = Math.max(1, Math.ceil(totalSubscriptions / limit));
 
     return res.status(200).json(new ApiResponse({
         channels: subscriptions.map(sub => sub.channel),
         pagination: {
-            page: pageNum,
-            limit: limitNum,
+            page,
+            limit,
             totalDocs: totalSubscriptions,
             totalPages,
-            hasNextPage: pageNum < totalPages,
-            hasPrevPage: pageNum > 1
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1
         }
     }, 200, "Subscribed channels fetched successfully"));
 });

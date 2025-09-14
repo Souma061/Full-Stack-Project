@@ -382,13 +382,11 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
 });
 
 const getUserChannelProfile = asyncHandler(async (req, res) => {
-  const paramUsername = (req.params?.username || "").trim().toLowerCase();
-  if (!paramUsername) {
-    throw new ApiError(400, "Username param required");
-  }
+  // Zod validated via UsernameParamSchema; already normalized in schema
+  const { username } = req.params;
 
   const channelAgg = await User.aggregate([
-    { $match: { username: paramUsername } },
+    { $match: { username } },
     {
       $lookup: {
         from: "subscriptions",

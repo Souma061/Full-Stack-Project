@@ -5,7 +5,7 @@ import { ApiResponse } from "../utils/Apiresponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
-    // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
+    // Zod not required here; no external inputs beyond auth
     const channelId = req.user._id;
 
     const channelStats = await Video.aggregate([
@@ -68,24 +68,12 @@ const getChannelStats = asyncHandler(async (req, res) => {
 });
 
 const getChannelVideos = asyncHandler(async (req, res) => {
-    // Get all the videos uploaded by the channel
+    // Zod validated via DashboardVideosQuery in routes
     const channelId = req.user._id;
-    const { page = 1, limit = 10, sortBy = "createdAt", sortType = "desc" } = req.query;
+    const { page = 1, limit = 20, sortBy = "createdAt", sortType = "desc" } = req.query;
 
-    let pageNum = parseInt(page, 10);
-    let limitNum = parseInt(limit, 10);
-    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-    if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
-    if (limitNum > 50) limitNum = 50;
-
-    const skip = (pageNum - 1) * limitNum;
-    const validSortFields = ["createdAt", "views", "likesCount", "title"];
-    const validSortTypes = ["asc", "desc"];
-
-    const actualSortBy = validSortFields.includes(sortBy) ? sortBy : "createdAt";
-    const actualSortType = validSortTypes.includes(sortType) ? sortType : "desc";
-
-    const sortOrder = actualSortType === "desc" ? -1 : 1;
+    const skip = (page - 1) * limit;
+    const sortOrder = sortType === "desc" ? -1 : 1;
 
     // aggregation pipeline to get video along with like count
     const videos = await Video.aggregate([
@@ -123,7 +111,7 @@ const getChannelVideos = asyncHandler(async (req, res) => {
                 title: 1,
                 description: 1,
                 thumbnail: 1,
-                videoFile: 1,
+                videoFiles: 1,
                 duration: 1,
                 views: 1,
                 isPublished: 1,
@@ -134,16 +122,12 @@ const getChannelVideos = asyncHandler(async (req, res) => {
 
             }
         },
-        {
-            $sort: {
-                [actualSortBy]: sortOrder
-            }
-        },
+        { $sort: { [sortBy]: sortOrder } },
         {
             $skip: skip
         },
         {
-            $limit: limitNum
+            $limit: limit
         }
 
     ]);
@@ -151,21 +135,21 @@ const getChannelVideos = asyncHandler(async (req, res) => {
     // get total count for pagination
 
     const totalVideos = await Video.countDocuments({ owner: channelId });
-    const totalPages = Math.max(1, Math.ceil(totalVideos / limitNum));
+    const totalPages = Math.max(1, Math.ceil(totalVideos / limit));
 
     return res.status(200).json(new ApiResponse({
         videos,
         pagination: {
-            page: pageNum,
-            limit: limitNum,
+            page,
+            limit,
             totalDocs: totalVideos,
             totalPages,
-            hasNextPage: pageNum < totalPages,
-            hasPrevPage: pageNum > 1
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1
         },
         sortInfo: {
-            sortBy: actualSortBy,
-            sortType: actualSortType
+            sortBy,
+            sortType
         }
     }, 200, "Channel videos fetched successfully"));
 

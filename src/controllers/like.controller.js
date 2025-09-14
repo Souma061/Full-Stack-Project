@@ -1,4 +1,3 @@
-import { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
 import { Like } from "../models/like.model.js";
 import { Tweet } from "../models/tweet.model.js";
@@ -8,11 +7,7 @@ import { ApiResponse } from '../utils/Apiresponse.js';
 import { asyncHandler } from '../utils/asynchandler.js';
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
-    const { videoId } = req.params;
-
-    if (!isValidObjectId(videoId)) {
-        throw new ApiError(400, "Invalid video ID");
-    }
+    const { videoId } = req.params; // Zod validated
     const video = await Video.findById(videoId);
     if (!video) {
         throw new ApiError(404, "Video not found");
@@ -48,11 +43,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 });
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
-    const { commentId } = req.params;
-
-    if (!isValidObjectId(commentId)) {
-        throw new ApiError(400, "Invalid comment ID");
-    }
+    const { commentId } = req.params; // Zod validated
 
     const comment = await Comment.findById(commentId);
     if (!comment) {
@@ -92,11 +83,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 });
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
-    const { tweetId } = req.params;
-
-    if (!isValidObjectId(tweetId)) {
-        throw new ApiError(400, "Invalid tweet ID");
-    }
+    const { tweetId } = req.params; // Zod validated
     const tweet = await Tweet.findById(tweetId);
     if (!tweet) {
         throw new ApiError(404, "Tweet not found");
@@ -130,17 +117,8 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 });
 
 const getLikedVideos = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10 } = req.query;
-
-    // Parse and validate pagination
-    let pageNum = parseInt(page, 10);
-    let limitNum = parseInt(limit, 10);
-
-    if (isNaN(pageNum) || pageNum < 1) pageNum = 1;
-    if (isNaN(limitNum) || limitNum < 1) limitNum = 10;
-    if (limitNum > 50) limitNum = 50; // hard cap
-
-    const skip = (pageNum - 1) * limitNum;
+    const { page = 1, limit = 20 } = req.query; // Zod coerced
+    const skip = (page - 1) * limit;
 
     // Fetch liked videos with pagination
     const likedVideos = await Like.find({
@@ -153,7 +131,7 @@ const getLikedVideos = asyncHandler(async (req, res) => {
             path: 'owner',
             select: 'username fullName avatar'
         }
-    }).sort({ createdAt: -1 }).skip(skip).limit(limitNum).lean();
+    }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean();
 
     const videos = likedVideos.map(like => like.video).filter(video => video !== null);
 
@@ -161,19 +139,19 @@ const getLikedVideos = asyncHandler(async (req, res) => {
         likedBy: req.user._id,
         video: { $exists: true, $ne: null }  // Fixed: $exist -> $exists
     });
-    const totalPages = Math.max(1, Math.ceil(totalDocs / limitNum));
+    const totalPages = Math.max(1, Math.ceil(totalDocs / limit));
 
     return res.status(200).json(
         new ApiResponse(
             {
                 videos,
                 pagination: {
-                    page: pageNum,
-                    limit: limitNum,
+                    page,
+                    limit,
                     totalDocs,
                     totalPages,
-                    hasNextPage: pageNum < totalPages,  // Fixed: hasNextpage -> hasNextPage
-                    hasPrevPage: pageNum > 1
+                    hasNextPage: page < totalPages,
+                    hasPrevPage: page > 1
                 }
             },
             200,
