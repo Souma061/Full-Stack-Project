@@ -1227,3 +1227,4 @@ Headers: Authorization: Bearer <token>
    - Modifying others' playlists
    - Invalid sort parameters
 ```
+"node ./node_modules/nodemon/bin/nodemon.js --exec \"node -r dotenv/config\" src/index.js"
