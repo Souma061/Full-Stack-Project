@@ -1,10 +1,10 @@
 import { z } from "zod";
+import { ObjectIdSchema } from "./common.schemas.js";
+
+// Re-export for backward compatibility
+export { ObjectIdSchema };
 
 // Reusable primitive schemas
-
-export const ObjectIdSchema = z
-  .string()
-  .regex(/^[0-9a-fA-F]{24}$/, "Invalid ObjectId format");
 
 export const EmailSchema = z
   .string()

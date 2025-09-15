@@ -10,10 +10,11 @@ export const TweetCreateBody = z
   })
   .strict();
 
-export const TweetUpdateBody = TweetCreateBody.partial()
-  .refine((v) => Object.keys(v).length > 0, {
+export const TweetUpdateBody = TweetCreateBody.partial().refine(
+  (v) => Object.keys(v).length > 0,
+  {
     message: "At least one field must be provided for update",
-  })
-  .strict();
+  }
+);
 
 export const TweetListQuery = PaginationQuery;

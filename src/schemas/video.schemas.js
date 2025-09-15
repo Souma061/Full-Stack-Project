@@ -23,8 +23,9 @@ export const VideoCreateBody = z
   })
   .strict();
 
-export const VideoUpdateBody = VideoCreateBody.partial()
-  .refine((v) => Object.keys(v).length > 0, {
+export const VideoUpdateBody = VideoCreateBody.partial().refine(
+  (v) => Object.keys(v).length > 0,
+  {
     message: "At least one field must be provided for update",
-  })
-  .strict();
+  }
+);
