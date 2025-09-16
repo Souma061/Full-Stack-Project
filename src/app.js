@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import { globalErrorHandler,AppError } from './middlewares/error.middleware.js';
 
 const app = express();
 
@@ -32,6 +33,24 @@ import playlistRouter from './routes/playlist.routes.js';
 import subscriptionRouter from './routes/subscription.routes.js';
 import userRouter from './routes/user.routes.js';
 import videoRouter from './routes/video.routes.js';
+// mount the global error handler
+app.use('/api/auth',authRoutes)
+app.use('/api/users',userRoutes)
+app.use('/api/videos',videoRoutes)
+
+// handle undefined routes
+
+app.all('*', (req,res,next)=> {
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`,404))
+})
+
+app.use(globalErrorHandler);
+
+
+
+
+
+
 
 
 app.use('/api/v1/users', userRouter);
@@ -44,5 +63,3 @@ app.use('/api/v1/dashboard', dashboardRouter);
 app.use('/api/v1/healthcheck', healthcheckRouter);
 
 export { app };
-
-

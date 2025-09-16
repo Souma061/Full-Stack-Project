@@ -21,6 +21,7 @@
 
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import { AppError, catchAsync } from "../middlewares/error.middleware.js";
 import { User } from "../models/users.model.js";
 import { ApiError } from "../utils/apierror.js";
 import { ApiResponse } from "../utils/Apiresponse.js";
@@ -263,18 +264,26 @@ const changeUserPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse({}, 200, "Password changed successfully"));
 });
 
-const getCurrentUser = asyncHandler(async (req, res) => {
-  return res
-    .status(200)
-    .json(new ApiResponse(req.user, 200, "Current user fetched successfully"));
-
-  // What I have done so far:
-  // 1. Retrieved user from req (set by auth middleware)
-  // 2. Sent user data in response
-  // Next steps:
-  // - Ensure sensitive fields are excluded (e.g., password)
-  // - Test the endpoint to verify it returns correct user data
+const getCurrentUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user?._id).select(
+    "-password -refreshToken"
+  );
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    message: "Current user fetched successfully",
+    data: user,
+  });
 });
+
+// What I have done so far:
+// 1. Retrieved user from req (set by auth middleware)
+// 2. Sent user data in response
+// Next steps:
+// - Ensure sensitive fields are excluded (e.g., password)
+// - Test the endpoint to verify it returns correct user data
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
   // Zod already validated and normalized these fields
