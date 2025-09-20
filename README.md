@@ -150,6 +150,14 @@ Detailed system architecture, design patterns, database schema, and technical de
 
 Step-by-step deployment instructions for Railway, Heroku, Vercel, and Docker.
 
+### 🎯 **[Interview Preparation](./docs/INTERVIEW_PREPARATION.md)**
+
+Comprehensive backend developer interview guide with questions, answers, and talking points.
+
+### ⚡ **[Quick Reference Card](./docs/INTERVIEW_QUICK_REFERENCE.md)**
+
+Last-minute interview prep with key concepts and confidence builders.
+
 ## 🔗 **Core API Endpoints**
 
 | Category             | Endpoints                                                             | Description          |
@@ -175,7 +183,7 @@ npm test
 npm run test:coverage
 
 # Run specific test file
-npm test -- bronze-final.test.js
+npm test -- api.integration.test.js
 ```
 
 ### **Test Results**

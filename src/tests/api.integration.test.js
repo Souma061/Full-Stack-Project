@@ -1,13 +1,20 @@
 import request from "supertest";
 import { app } from "../app.js";
 
-describe("Bronze Level - Essential API Tests (No Database)", () => {
+describe("API Integration Tests - Core Functionality", () => {
   test("Server health check should work", async () => {
     const response = await request(app).get("/health").expect(200);
 
     expect(response.body.status).toBe("API is running!");
     expect(response.body).toHaveProperty("timestamp");
     expect(response.body).toHaveProperty("uptime");
+  });
+
+  test("API healthcheck endpoint should work", async () => {
+    const response = await request(app).get("/api/v1/healthcheck").expect(200);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.message).toBe("Healthcheck data fetched successfully");
   });
 
   test("404 error handling should work", async () => {
@@ -31,5 +38,17 @@ describe("Bronze Level - Essential API Tests (No Database)", () => {
     expect(typeof app).toBe("function");
   });
 
-  // Removed API route mounting test - not essential for Bronze Level
+  test("Response headers should be present", async () => {
+    const response = await request(app).get("/health").expect(200);
+
+    // Test that basic headers are present
+    expect(response.headers).toBeDefined();
+    expect(response.headers["content-type"]).toBeDefined();
+  });
+
+  test("JSON responses should have correct content-type", async () => {
+    const response = await request(app).get("/health").expect(200);
+
+    expect(response.headers["content-type"]).toMatch(/json/);
+  });
 });

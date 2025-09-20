@@ -241,7 +241,7 @@ npm run test:watch
 npm run test:coverage
 
 # Run specific test file
-npm test -- bronze-final.test.js
+npm test -- api.integration.test.js
 ```
 
 ### **Test Results**
