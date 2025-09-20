@@ -1,5 +1,4 @@
-import { success } from "zod/v4";
-import { ApiError } from "../utils/apierror";
+import { ApiError } from "../utils/apierror.js";
 
 export class AppError extends Error {
   constructor(message, statusCode) {
@@ -29,30 +28,28 @@ export const globalErrorHandler = (err, req, res, next) => {
 
   // mongoose duplicate key
 
-  if(err.code === 11000) {
+  if (err.code === 11000) {
     const value = err.message.match(/(["'])(\\?.)*?\1/)[0];
     const message = `Dupicate field value: ${value}. Please use another value!`;
-    error = new ApiError(message,400)
-
+    error = new ApiError(message, 400);
   }
 
   // mongoose validation error
-  if(err.name === "ValidationError") {
-    const errors = Object.values(err.errors).map(val => val.message);
-    const message = `Invalid input data. ${errors.join('. ')}`;
-    error = new ApiError(message,400)
+  if (err.name === "ValidationError") {
+    const errors = Object.values(err.errors).map((val) => val.message);
+    const message = `Invalid input data. ${errors.join(". ")}`;
+    error = new ApiError(message, 400);
   }
 
   // jwt error
-  if(err.name  === "JsonWebTokenError") {
+  if (err.name === "JsonWebTokenError") {
     const message = "Invalid token. Please log in again!";
-    error = new ApiError(message,401)
-
+    error = new ApiError(message, 401);
   }
 
-  if(err.name === "TokenExpiredError") {
+  if (err.name === "TokenExpiredError") {
     const message = "Your token has expired! Please log in again.";
-    error = new ApiError(message,401)
+    error = new ApiError(message, 401);
   }
 
   //send error response
@@ -60,13 +57,12 @@ export const globalErrorHandler = (err, req, res, next) => {
     success: false,
     error: {
       message: error.message || "Internal Server Error",
-      ...(process.env.NODE_ENV === "development" && { stack: error.stack })
-
-    }
-  })
+      ...(process.env.NODE_ENV === "development" && { stack: error.stack }),
+    },
+  });
 };
 
 // catch async errors
-export const catchAsync = (fn) => (req,res,next) =>{
-  Promise.resolve(fn(req,res,next)).catch(next);
-}
+export const catchAsync = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch(next);
+};
