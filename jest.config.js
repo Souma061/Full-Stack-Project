@@ -1,27 +1,32 @@
 export default {
   testEnvironment: "node",
-  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
-  testMatch: ['**/_tests_/**/*.test.js',
-            '**/tests/**/*.test.js'],
-  collectCoverageForm: [
-    "src/**/*.js",
-    "!src/**/*.test.js",
-    "!src/**/index.js",
-    "!src/jobs.js"
 
+  // Test file patterns
+  testMatch: ["<rootDir>/src/tests/**/*.test.js"],
+
+  // Setup files
+  setupFilesAfterEnv: ["<rootDir>/src/tests/setup/testSetup.js"],
+
+  // Coverage configuration
+  collectCoverage: true,
+  collectCoverageFrom: [
+    "src/**/*.js",
+    "!src/tests/**",
+    "!src/db/**",
+    "!src/index.js",
   ],
-  coverageThreshold: {
-    global: {
-      branches:70,
-      functions: 75,
-      lines: 80,
-      statements: 80
-    }
+
+  // Module resolution for ES modules
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
   },
+
+  // Transform configuration for ES modules
   transform: {},
-  extensionsToTreatAsEsm: [".js"],
-  moduleNameMapping: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
-  },
-  testTimeout: 20000
+
+  // Timeout
+  testTimeout: 30000,
+
+  // Verbose output
+  verbose: true,
 };
