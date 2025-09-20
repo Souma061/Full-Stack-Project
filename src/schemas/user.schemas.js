@@ -52,10 +52,12 @@ export const UsernameParamSchema = z
 
 export const UserRegisterSchema = z
   .object({
-    email: EmailSchema,
-    username: UsernameSchema,
-    fullName: FullNameSchema,
-    password: PasswordSchema,
+    username: z.string().min(3).max(20),
+    email: z.string().email(),
+    password: z.string().min(8),
+    fullName: z.string().min(1),
+    avatar: z.any().optional(), // Add .optional()
+    coverImage: z.any().optional(),
   })
   .strict();
 

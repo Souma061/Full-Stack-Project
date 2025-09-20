@@ -6,7 +6,11 @@ export const validateRequest =
     try {
       if (body) req.body = body.parse(req.body);
       if (params) req.params = params.parse(req.params);
-      if (query) req.query = query.parse(req.query);
+      if (query) {
+        // Parse and validate query, then assign back to req.query properties
+        const parsedQuery = query.parse(req.query);
+        Object.assign(req.query, parsedQuery);
+      }
       next();
     } catch (error) {
       if (error instanceof ZodError) {

@@ -68,26 +68,31 @@ const registerUser = asyncHandler(async (req, res) => {
   const avatarLocalPath = req.files?.avatar?.[0]?.path; // get path of uploaded avatar file
   const coverImageLocalPath = req.files?.coverImage?.[0]?.path;
 
-  if (!avatarLocalPath) {
-    throw new ApiError(400, "Avatar is required");
+  // if (!avatarLocalPath) {
+  //   throw new ApiError(400, "Avatar is required");
+  // }
+
+  let avatar = null;
+  if (avatarLocalPath) {
+    avatar = await uploadOnCloudinary(avatarLocalPath);
+    if (!avatar) {
+      throw new ApiError(500, "Error while uploading avatar");
+    }
   }
 
-  const avatar = await uploadOnCloudinary(avatarLocalPath);
   const coverImage = coverImageLocalPath
     ? await uploadOnCloudinary(coverImageLocalPath)
     : null;
 
-  if (!avatar) {
-    throw new ApiError(500, "Error while uploading avatar");
-  }
+  // Removed the redundant avatar check since avatar is now optional
 
   const user = await User.create({
     fullName,
+    avatar: avatar?.url || null, // Handle null avatar
+    coverImage: coverImage?.url || null,
     email,
-    username: username.toLowerCase(),
     password,
-    avatar: avatar.url,
-    coverImage: coverImage?.url || "",
+    username: username.toLowerCase(),
   });
 
   const createdUser = await User.findById(user._id).select(
