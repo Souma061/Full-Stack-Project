@@ -10,7 +10,7 @@
 
 ## 🌟 **Live Demo & Links**
 
-- 🌐 **Live API**: [Deploy your own!](https://railway.app/new)
+- 🌐 **Live API**: [https://full-stack-project-1-ut99.onrender.com](https://full-stack-project-1-ut99.onrender.com)
 - 📋 **Health Check**: `/api/v1/healthcheck`
 - 📖 **API Documentation**: [Full API Docs](./docs/API_DOCUMENTATION.md)
 - 🏗️ **Architecture**: [System Architecture](./docs/ARCHITECTURE.md)
@@ -112,7 +112,7 @@ CORS_ORIGIN=http://localhost:3000
 ### **Base URL**
 
 ```
-Production: https://your-backend.railway.app/api/v1
+Production: https://full-stack-project-1-ut99.onrender.com/api/v1
 Development: http://localhost:8000/api/v1
 ```
 
@@ -148,7 +148,7 @@ Detailed system architecture, design patterns, database schema, and technical de
 
 ### 🚀 **[Deployment Guide](./docs/DEPLOYMENT.md)**
 
-Step-by-step deployment instructions for Railway, Heroku, Vercel, and Docker.
+Step-by-step deployment instructions for Render, Heroku, Vercel, and Docker.
 
 ### 🎯 **[Interview Preparation](./docs/INTERVIEW_PREPARATION.md)**
 
@@ -241,9 +241,9 @@ src/
 
 ## 🚀 **Deployment Options**
 
-### **Railway (Recommended)**
+### **Render (Recommended)**
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new)
+[![Deploy on Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Souma061/Full-Stack-Project)
 
 ### **Heroku**
 

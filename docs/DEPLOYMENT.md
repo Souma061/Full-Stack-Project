@@ -21,7 +21,7 @@
 
 ---
 
-## 🌟 **Railway Deployment (Recommended)**
+## 🌟 **Render Deployment (Recommended)**
 
 ### **Step 1: Prepare Your Repository**
 
@@ -62,18 +62,26 @@ EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
 ```
 
-### **Step 2: Deploy to Railway**
+### **Step 2: Deploy to Render**
 
-1. **Visit Railway**: Go to [railway.app](https://railway.app)
+1. **Visit Render**: Go to [render.com](https://render.com)
 
 2. **Sign in with GitHub**: Connect your GitHub account
 
-3. **Create New Project**:
-   - Click "New Project"
-   - Select "Deploy from GitHub repo"
-   - Choose your repository
+3. **Create New Web Service**:
+   - Click "New +"
+   - Select "Web Service"
+   - Connect your GitHub repository
 
-4. **Configure Environment Variables**:
+4. **Configure Build & Deploy Settings**:
+   - **Name**: `full-stack-project`
+   - **Environment**: `Node`
+   - **Region**: Choose closest to your users
+   - **Branch**: `main`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+
+5. **Configure Environment Variables**:
 
    ```
    MONGODB_URI=mongodb+srv://your-cluster-url
@@ -87,13 +95,13 @@ EMAIL_PASS=your-app-password
    NODE_ENV=production
    ```
 
-5. **Deploy**: Railway will automatically detect your Node.js app and deploy
+6. **Deploy**: Render will automatically build and deploy your app
 
 ### **Step 3: Verify Deployment**
 
-1. **Check Health**: Visit `https://your-app.railway.app/api/v1/healthcheck`
+1. **Check Health**: Visit `https://your-app.onrender.com/api/v1/healthcheck`
 2. **Test API**: Try registering a user via API
-3. **Monitor Logs**: Check Railway dashboard for any errors
+3. **Monitor Logs**: Check Render dashboard for any errors
 
 ---
 
@@ -389,8 +397,8 @@ Your app includes a health check at `/api/v1/healthcheck`:
    - Add your health check URL
    - Get alerts via email/SMS
 
-2. **Railway Monitoring**: Built-in metrics
-   - View in Railway dashboard
+2. **Render Monitoring**: Built-in metrics
+   - View in Render dashboard
    - Monitor CPU, memory, network
 
 ---
@@ -444,8 +452,8 @@ Your app includes a health check at `/api/v1/healthcheck`:
 1. **Check Logs**:
 
    ```bash
-   # Railway
-   railway logs
+   # Render
+   # Check logs in Render dashboard
 
    # Heroku
    heroku logs --tail
@@ -502,22 +510,22 @@ Your app includes a health check at `/api/v1/healthcheck`:
 
 ```bash
 # Check deployment status
-curl https://your-app.railway.app/api/v1/healthcheck
+curl https://full-stack-project-1-ut99.onrender.com/api/v1/healthcheck
 
 # Test user registration
-curl -X POST https://your-app.railway.app/api/v1/users/register \
+curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/users/register \
   -H "Content-Type: application/json" \
   -d '{"username":"test","email":"test@test.com","password":"Test123!","fullName":"Test User"}'
 
 # Test authentication
-curl -X GET https://your-app.railway.app/api/v1/users/current-user \
+curl -X GET https://full-stack-project-1-ut99.onrender.com/api/v1/users/current-user \
   -H "Authorization: Bearer YOUR_TOKEN"
 
-# Monitor logs (Railway)
-railway logs --follow
+# Monitor logs (Render)
+# Check logs in Render dashboard
 
-# Check environment variables (Railway)
-railway variables
+# Check environment variables (Render)
+# View in Render dashboard settings
 ```
 
 ---

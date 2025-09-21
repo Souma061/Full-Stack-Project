@@ -4,7 +4,7 @@
 
 ### **Base URLs**
 
-- **Production**: `https://your-backend.railway.app/api/v1`
+- **Production**: `https://full-stack-project-1-ut99.onrender.com/api/v1`
 - **Development**: `http://localhost:8000/api/v1`
 
 ### **Authentication**
@@ -87,7 +87,7 @@ Authorization: Bearer <access_token>
 **cURL Example:**
 
 ```bash
-curl -X POST https://your-backend.railway.app/api/v1/users/register \
+curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/users/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "johndoe",
@@ -287,7 +287,7 @@ curl -X POST https://your-backend.railway.app/api/v1/users/register \
 **cURL Example:**
 
 ```bash
-curl -X PATCH https://your-backend.railway.app/api/v1/users/avatar \
+curl -X PATCH https://full-stack-project-1-ut99.onrender.com/api/v1/users/avatar \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -F "avatar=@/path/to/avatar.jpg"
 ```
@@ -448,7 +448,7 @@ GET /videos?page=1&limit=10&query=tutorial&sortBy=views&sortType=desc
 **cURL Example:**
 
 ```bash
-curl -X POST https://your-backend.railway.app/api/v1/videos \
+curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/videos \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -F "videoFile=@/path/to/video.mp4" \
   -F "thumbnail=@/path/to/thumbnail.jpg" \

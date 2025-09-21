@@ -10,8 +10,8 @@
 
 ## 🌟 **Live Demo & Links**
 
-- 🌐 **Live API**: [https://your-backend.railway.app](https://your-backend.railway.app)
-- 📋 **Health Check**: [https://your-backend.railway.app/health](https://your-backend.railway.app/health)
+- 🌐 **Live API**: [https://full-stack-project-1-ut99.onrender.com](https://full-stack-project-1-ut99.onrender.com)
+- 📋 **Health Check**: [https://full-stack-project-1-ut99.onrender.com/health](https://full-stack-project-1-ut99.onrender.com/health)
 - 📖 **API Documentation**: [Interactive Docs](#api-documentation)
 - 🔍 **GitHub Repository**: [Full-Stack-Project](https://github.com/Souma061/Full-Stack-Project)
 
@@ -111,7 +111,7 @@ CORS_ORIGIN=http://localhost:3000
 ### **Base URL**
 
 ```
-Production: https://your-backend.railway.app/api/v1
+Production: https://full-stack-project-1-ut99.onrender.com/api/v1
 Development: http://localhost:8000/api/v1
 ```
 
@@ -338,14 +338,14 @@ This app is deployed on Railway with the following features:
 
 ### **Deploy Your Own**
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/Souma061/Full-Stack-Project)
+[![Deploy on Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Souma061/Full-Stack-Project)
 
 ## 📊 **API Usage Examples**
 
 ### **Register User**
 
 ```bash
-curl -X POST https://your-backend.railway.app/api/v1/users/register \
+curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/users/register \
   -H "Content-Type: application/json" \
   -d '{
     "username": "johndoe",
@@ -358,7 +358,7 @@ curl -X POST https://your-backend.railway.app/api/v1/users/register \
 ### **Login User**
 
 ```bash
-curl -X POST https://your-backend.railway.app/api/v1/users/login \
+curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/users/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -369,13 +369,13 @@ curl -X POST https://your-backend.railway.app/api/v1/users/login \
 ### **Get Videos**
 
 ```bash
-curl -X GET "https://your-backend.railway.app/api/v1/videos?page=1&limit=10"
+curl -X GET "https://full-stack-project-1-ut99.onrender.com/api/v1/videos?page=1&limit=10"
 ```
 
 ### **Upload Video**
 
 ```bash
-curl -X POST https://your-backend.railway.app/api/v1/videos \
+curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/videos \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -F "videoFile=@/path/to/video.mp4" \
   -F "thumbnail=@/path/to/thumbnail.jpg" \
@@ -401,7 +401,7 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 - 🌐 Portfolio: [Your Portfolio URL]
 - 💼 LinkedIn: [Your LinkedIn Profile]
-- 📧 Email: [Your Email]
+- 📧 Email: [soumabrataghosh57@gmail.com]
 - 🐱 GitHub: [@Souma061](https://github.com/Souma061)
 
 ## 🙏 **Acknowledgments**
