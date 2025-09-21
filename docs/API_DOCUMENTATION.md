@@ -1144,3 +1144,394 @@ curl -X POST https://full-stack-project-1-ut99.onrender.com/api/v1/videos \
 - **Formats**: JPG, JPEG, PNG
 - **Max Size**: 2MB
 - **Recommended**: 1280x720px (16:9 ratio)
+
+---
+
+## 🧪 **Postman Testing Guide**
+
+### **Import Postman Collection**
+
+You can import this collection directly into Postman to test all endpoints:
+
+**Collection JSON:**
+
+```json
+{
+  "info": {
+    "name": "Full Stack Video Platform API",
+    "description": "Complete API collection for testing the video platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://full-stack-project-1-ut99.onrender.com/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"testuser123\",\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePass123!\",\n  \"fullName\": \"Test User\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "if (pm.response.code === 200) {",
+                    "  const response = pm.response.json();",
+                    "  pm.collectionVariables.set('accessToken', response.data.accessToken);",
+                    "}"
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/current-user",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "current-user"]
+            }
+          }
+        },
+        {
+          "name": "Update User Account",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/users/update-account",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "update-account"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Updated Test User\",\n  \"email\": \"updated@example.com\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Videos",
+      "item": [
+        {
+          "name": "Get All Videos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/videos?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["videos"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Upload Video",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/videos",
+              "host": ["{{baseUrl}}"],
+              "path": ["videos"]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "Test Video Upload",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "This is a test video upload from Postman",
+                  "type": "text"
+                },
+                {
+                  "key": "videoFile",
+                  "type": "file",
+                  "src": ""
+                },
+                {
+                  "key": "thumbnail",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+```
+
+### **Step-by-Step Testing Process**
+
+#### **1. Setup Environment**
+
+1. **Open Postman** and create a new collection
+2. **Import the JSON** above or manually create requests
+3. **Set Environment Variables**:
+   - `baseUrl`: `https://full-stack-project-1-ut99.onrender.com/api/v1`
+   - `accessToken`: (will be set automatically after login)
+
+#### **2. Test Authentication Flow**
+
+**Register a Test User:**
+
+```
+POST {{baseUrl}}/users/register
+Content-Type: application/json
+
+{
+  "username": "postmantest",
+  "email": "postman@test.com",
+  "password": "TestPass123!",
+  "fullName": "Postman Test User"
+}
+```
+
+**Login and Get Token:**
+
+```
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+  "email": "postman@test.com",
+  "password": "TestPass123!"
+}
+```
+
+_Copy the `accessToken` from response for subsequent requests_
+
+#### **3. Test Protected Endpoints**
+
+**Get Current User:**
+
+```
+GET {{baseUrl}}/users/current-user
+Authorization: Bearer YOUR_ACCESS_TOKEN
+```
+
+**Get Videos:**
+
+```
+GET {{baseUrl}}/videos?page=1&limit=5
+```
+
+**Upload Video (Form Data):**
+
+```
+POST {{baseUrl}}/videos
+Authorization: Bearer YOUR_ACCESS_TOKEN
+Content-Type: multipart/form-data
+
+Form Fields:
+- title: "My Test Video"
+- description: "Testing video upload via Postman"
+- videoFile: [Select video file]
+- thumbnail: [Select image file]
+```
+
+#### **4. Test Video Interactions**
+
+**Like a Video:**
+
+```
+POST {{baseUrl}}/likes/video/VIDEO_ID
+Authorization: Bearer YOUR_ACCESS_TOKEN
+```
+
+**Add Comment:**
+
+```
+POST {{baseUrl}}/videos/VIDEO_ID/comments
+Authorization: Bearer YOUR_ACCESS_TOKEN
+Content-Type: application/json
+
+{
+  "content": "Great video! Testing comments via Postman."
+}
+```
+
+### **Environment Variables Setup**
+
+Create these variables in Postman:
+
+| Variable      | Value                                                   | Description                      |
+| ------------- | ------------------------------------------------------- | -------------------------------- |
+| `baseUrl`     | `https://full-stack-project-1-ut99.onrender.com/api/v1` | API base URL                     |
+| `accessToken` | `""`                                                    | JWT token (auto-set after login) |
+| `userId`      | `""`                                                    | Current user ID                  |
+| `videoId`     | `""`                                                    | Test video ID                    |
+
+### **Pre-request Scripts**
+
+**For Login Request** (auto-saves token):
+
+```javascript
+pm.test("Login successful", function () {
+  if (pm.response.code === 200) {
+    const response = pm.response.json();
+    pm.collectionVariables.set("accessToken", response.data.accessToken);
+    pm.collectionVariables.set("userId", response.data.user._id);
+    console.log("Token saved:", response.data.accessToken);
+  }
+});
+```
+
+### **Tests Scripts Examples**
+
+**For Registration:**
+
+```javascript
+pm.test("User registered successfully", function () {
+  pm.expect(pm.response.code).to.equal(201);
+  const response = pm.response.json();
+  pm.expect(response.success).to.be.true;
+  pm.expect(response.data.user).to.have.property("_id");
+});
+```
+
+**For Video Upload:**
+
+```javascript
+pm.test("Video uploaded successfully", function () {
+  pm.expect(pm.response.code).to.equal(201);
+  const response = pm.response.json();
+  pm.expect(response.data.video).to.have.property("_id");
+  pm.collectionVariables.set("videoId", response.data.video._id);
+});
+```
+
+### **Common Testing Scenarios**
+
+#### **🔐 Authentication Testing**
+
+1. Register → Login → Access Protected Route
+2. Test invalid credentials
+3. Test token expiration
+4. Test refresh token flow
+
+#### **📹 Video Management Testing**
+
+1. Upload video → Get video → Update video → Delete video
+2. Test file upload validation
+3. Test unauthorized access
+4. Test pagination
+
+#### **💬 Interaction Testing**
+
+1. Like video → Unlike video
+2. Add comment → Update comment → Delete comment
+3. Subscribe to channel → Unsubscribe
+
+#### **📊 Error Handling Testing**
+
+1. Test 400 (Bad Request) - Invalid data
+2. Test 401 (Unauthorized) - Missing token
+3. Test 403 (Forbidden) - Insufficient permissions
+4. Test 404 (Not Found) - Non-existent resources
+5. Test 429 (Rate Limited) - Too many requests
+
+### **Quick Test Checklist**
+
+- [ ] Health check endpoint responds
+- [ ] User registration works
+- [ ] User login returns valid token
+- [ ] Protected routes require authentication
+- [ ] File uploads work properly
+- [ ] Pagination works correctly
+- [ ] Error responses are properly formatted
+- [ ] Rate limiting is enforced
+- [ ] CORS headers are present
