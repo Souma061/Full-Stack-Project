@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "a backend project",
   "type": "module",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js",
+    "build": "npm install",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js --exec \"node -r dotenv/config\" src/index.js",
     "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
     "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
@@ -12,7 +14,10 @@
     "test:unit": "NODE_OPTIONS='--experimental-vm-modules' jest --testPathPattern=unit",
     "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --testPathPattern=integration",
     "test:debug": "NODE_OPTIONS='--experimental-vm-modules --inspect-brk' jest --runInBand"
-
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
   "keywords": [
     "javascript",
