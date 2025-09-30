@@ -10,6 +10,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
   // Zod validated via VideoListQuery in routes
   const { page = 1, limit = 20, query, sortBy, sortType, userId } = req.query;
 
+  // Ensure page and limit are numbers (in case validation doesn't convert properly)
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+
   const filter = { isPublished: true };
   if (userId) {
     filter.owner = new mongoose.Types.ObjectId(userId);
@@ -25,7 +29,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     ? { [sortBy]: sortType === "asc" ? 1 : -1 }
     : { createdAt: -1 };
 
-  const skip = (page - 1) * limit; // Calculate documents to skip
+  const skip = (pageNum - 1) * limitNum; // Calculate documents to skip
 
   // Using aggregation to join with users collection to get owner details
 
@@ -53,7 +57,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     { $unwind: "$owner" }, // unwind : deconstructs the array field from the input documents to output a document for each element
     { $sort: sortOptions },
     { $skip: skip },
-    { $limit: limit },
+    { $limit: limitNum },
     {
       $project: {
         // project only necessary fields
@@ -69,19 +73,19 @@ const getAllVideos = asyncHandler(async (req, res) => {
   ]);
 
   const totalDocs = await Video.countDocuments(filter);
-  const totalPages = Math.max(1, Math.ceil(totalDocs / limit));
+  const totalPages = Math.max(1, Math.ceil(totalDocs / limitNum));
 
   return res.status(200).json(
     new ApiResponse(
       {
         videos,
         pagination: {
-          page,
-          limit,
+          page: pageNum,
+          limit: limitNum,
           totalDocs,
           totalPages,
-          hasNextPage: page < totalPages,
-          hasPrevPage: page > 1,
+          hasNextPage: pageNum < totalPages,
+          hasPrevPage: pageNum > 1,
         },
       },
       200,
