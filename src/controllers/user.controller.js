@@ -126,11 +126,9 @@ const loginUser = asyncHandler(async (req, res) => {
       Boolean
     ),
   });
-
-  if (!user) {
-    throw new ApiError(404, "User not found, please register");
+  if(!user) {
+    throw new ApiError(401, "Invalid credentials");
   }
-
   const isMatch = await user.isPasswordCorrect(password);
   if (!isMatch) {
     throw new ApiError(401, "Invalid credentials");

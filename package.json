@@ -8,12 +8,12 @@
     "start": "node src/index.js",
     "build": "npm install",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js --exec \"node -r dotenv/config\" src/index.js",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest",
-    "test:watch": "NODE_OPTIONS='--experimental-vm-modules' jest --watch",
-    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --coverage",
-    "test:unit": "NODE_OPTIONS='--experimental-vm-modules' jest --testPathPattern=unit",
-    "test:integration": "NODE_OPTIONS='--experimental-vm-modules' jest --testPathPattern=integration",
-    "test:debug": "NODE_OPTIONS='--experimental-vm-modules --inspect-brk' jest --runInBand"
+  "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+  "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+  "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+  "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=unit",
+  "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=integration",
+  "test:debug": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
   },
   "engines": {
     "node": ">=18.0.0",
