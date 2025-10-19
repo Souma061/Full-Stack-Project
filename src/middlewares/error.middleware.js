@@ -1,4 +1,4 @@
-import { ApiError } from "../utils/apierror.js";
+import { ApiError } from "../utils/ApiError.js";
 
 export class AppError extends Error {
   constructor(message, statusCode) {

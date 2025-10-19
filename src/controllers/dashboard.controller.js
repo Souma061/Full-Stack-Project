@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { Subscription } from "../models/subscription.model.js";
 import { Video } from "../models/video.model.js";
-import { ApiResponse } from "../utils/Apiresponse.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {

@@ -1,6 +1,6 @@
 import { version } from 'mongoose';
-import { ApiResponse } from "../utils/Apiresponse.js"; // Fixed: ApiResponse -> Apiresponse
-import { asyncHandler } from "../utils/asynchandler.js"; // Fixed: asyncHandler -> asynchandler
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asynchandler.js";
 
 
 const healthcheck = asyncHandler(async (req, res) => {
