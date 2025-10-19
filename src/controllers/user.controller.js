@@ -23,7 +23,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { AppError, catchAsync } from "../middlewares/error.middleware.js";
 import { User } from "../models/users.model.js";
-import { ApiError } from "../utils/ApiError.js";
+import { ApiError } from "../utils/apierror.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asynchandler.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
