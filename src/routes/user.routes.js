@@ -33,7 +33,6 @@ router.route("/login").post(validateRequest({body: UserLoginSchema}), loginUser)
 
 
 
-// secured routes
 
 router.route("/logout").post(verifyJWT, logOutUser);
 
