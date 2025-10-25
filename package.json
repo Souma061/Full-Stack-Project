@@ -3,17 +3,17 @@
   "version": "1.0.0",
   "description": "a backend project",
   "type": "module",
-  "main": "src/index.js",
+  "main": "Backend/src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node Backend/src/index.js",
     "build": "npm install",
-    "dev": "node ./node_modules/nodemon/bin/nodemon.js --exec \"node -r dotenv/config\" src/index.js",
-  "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
-  "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
-  "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-  "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=unit",
-  "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=integration",
-  "test:debug": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js --exec \"node -r dotenv/config\" Backend/src/index.js",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:unit": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=unit",
+    "test:integration": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --testPathPattern=integration",
+    "test:debug": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand"
   },
   "engines": {
     "node": ">=18.0.0",

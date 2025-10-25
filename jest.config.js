@@ -2,18 +2,18 @@ export default {
   testEnvironment: "node",
 
   // Test file patterns
-  testMatch: ["<rootDir>/src/tests/**/*.test.js"],
+  testMatch: ["<rootDir>/Backend/src/tests/**/*.test.js"],
 
   // Setup files
-  setupFilesAfterEnv: ["<rootDir>/src/tests/setup/testSetup.js"],
+  setupFilesAfterEnv: ["<rootDir>/Backend/src/tests/setup/testSetup.js"],
 
   // Coverage configuration
   collectCoverage: true,
   collectCoverageFrom: [
-    "src/**/*.js",
-    "!src/tests/**",
-    "!src/db/**",
-    "!src/index.js",
+    "Backend/src/**/*.js",
+    "!Backend/src/tests/**",
+    "!Backend/src/db/**",
+    "!Backend/src/index.js",
   ],
 
   // Module resolution for ES modules
