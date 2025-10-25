@@ -1,16 +1,63 @@
-# React + Vite
+# Youtube Clone Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a YouTube-inspired platform built with React and Vite.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- React 19
+- Vite for fast development
+- Material UI for UI components
+- Material UI Icons for iconography
+- Tailwind CSS for utility-first styling
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Install dependencies
 
-## Expanding the ESLint configuration
+```sh
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Start the development server
+
+```sh
+npm run dev
+```
+
+## Using Material UI
+
+Material UI is used for building the UI. To use a component:
+
+```jsx
+import Button from "@mui/material/Button";
+
+function App() {
+  return <Button variant="contained">Hello World</Button>;
+}
+```
+
+## Using Material UI Icons
+
+Material UI Icons are available via `@mui/icons-material`.
+
+```jsx
+import HomeIcon from "@mui/icons-material/Home";
+
+function App() {
+  return <HomeIcon />;
+}
+```
+
+Find more icons here: https://mui.com/material-ui/material-icons/
+
+## Fonts
+
+Roboto font is included via `@fontsource/roboto` for Material UI compatibility.
+
+## Tailwind CSS
+
+Tailwind is available for utility-first styling. You can use both Tailwind and Material UI together.
+
+---
+
+For more details, see the main project README or the [Material UI documentation](https://mui.com/).

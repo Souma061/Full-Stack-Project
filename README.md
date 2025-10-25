@@ -1,4 +1,4 @@
-# 🚀 Full-Stack Backend API
+# Full-Stack YouTube Clone Platform
 
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-5.x-blue.svg)](https://expressjs.com)
@@ -6,90 +6,64 @@
 [![Jest](https://img.shields.io/badge/Tests-Jest-red.svg)](https://jestjs.io)
 [![License](https://img.shields.io/badge/License-ISC-yellow.svg)](LICENSE)
 
-> **A production-ready, full-featured backend API built with Node.js, Express, and MongoDB. Features complete user authentication, file upload, video management, and social interactions.**
+> A professional, production-grade full-stack platform inspired by YouTube. Includes a robust backend API (Node.js, Express, MongoDB) and a modern frontend (React, Vite, Material UI, Tailwind CSS). Features user authentication, video management, social interactions, and more.
 
-## 🌟 **Live Demo & Links**
+---
 
-- 🌐 **Live API**: [https://full-stack-project-1-ut99.onrender.com](https://full-stack-project-1-ut99.onrender.com)
-- 📋 **Health Check**: `/api/v1/healthcheck`
-- 📖 **API Documentation**: [Full API Docs](./docs/API_DOCUMENTATION.md)
-- 🏗️ **Architecture**: [System Architecture](./docs/ARCHITECTURE.md)
-- 🚀 **Deployment**: [Deployment Guide](./docs/DEPLOYMENT.md)
+## � Live Demo & Documentation
 
-## ✨ **Key Features**
+- **Live API:** [https://full-stack-project-1-ut99.onrender.com](https://full-stack-project-1-ut99.onrender.com)
+- **Health Check:** `/api/v1/healthcheck`
+- **API Documentation:** [API Docs](./docs/API_DOCUMENTATION.md)
+- **Architecture:** [System Architecture](./docs/ARCHITECTURE.md)
+- **Deployment:** [Deployment Guide](./docs/DEPLOYMENT.md)
 
-### 🔐 **Authentication & Security**
+---
 
-- ✅ JWT-based authentication (Access + Refresh tokens)
-- ✅ Password hashing with bcrypt
-- ✅ Role-based access control
-- ✅ Rate limiting and security headers
-- ✅ Input validation with Zod schemas
+## ✨ Key Features
 
-### 📁 **File Management**
+- Secure JWT authentication & role-based access
+- Video upload, management, and streaming
+- Social features: comments, likes, playlists, subscriptions
+- File storage & optimization with Cloudinary
+- Robust validation, error handling, and logging
+- Modern, responsive frontend UI
+- 90%+ backend test coverage
 
-- ✅ Image and video upload to Cloudinary
-- ✅ Automatic image optimization
-- ✅ File type and size validation
-- ✅ Avatar and cover image support
+---
 
-### 🎥 **Video Platform Features**
+## 🚀 Quick Start
 
-- ✅ Video upload and management
-- ✅ Video metadata and thumbnails
-- ✅ Publish/unpublish functionality
-- ✅ View count tracking
-- ✅ Search and filtering
-
-### 💬 **Social Interactions**
-
-- ✅ Comment system with nested replies
-- ✅ Like/unlike videos and comments
-- ✅ User subscriptions and followers
-- ✅ Playlist creation and management
-- ✅ User activity tracking
-
-### 🛠️ **Technical Excellence**
-
-- ✅ Clean MVC architecture
-- ✅ Comprehensive error handling
-- ✅ Request/response logging
-- ✅ Database optimization
-- ✅ 90%+ test coverage
-- ✅ API response consistency
-
-## 🚀 **Quick Start**
-
-### **Prerequisites**
+### Prerequisites
 
 - Node.js 18+ and npm
 - MongoDB (local or cloud)
 - Cloudinary account
 
-### **Installation**
+### Installation
 
 ```bash
 # Clone the repository
 git clone https://github.com/Souma061/Full-Stack-Project.git
 cd Full-Stack-Project
 
-# Install dependencies
+# Install backend dependencies
 npm install
 
 # Set up environment variables
 cp .env.example .env
 # Edit .env with your configuration
 
-# Start development server
+# Start backend server
 npm run dev
 
-# Run tests
+# Run backend tests
 npm test
 ```
 
-### **Environment Setup**
+### Environment Setup
 
-```bash
+```env
 # Database
 MONGODB_URI=mongodb://localhost:27017/fullstack-app
 
@@ -107,24 +81,22 @@ PORT=8000
 CORS_ORIGIN=http://localhost:3000
 ```
 
-## 📋 **API Overview**
+---
 
-### **Base URL**
+## 📋 API Overview
 
-```
-Production: https://full-stack-project-1-ut99.onrender.com/api/v1
-Development: http://localhost:8000/api/v1
-```
+### Base URLs
 
-### **Authentication**
+- Production: `https://full-stack-project-1-ut99.onrender.com/api/v1`
+- Development: `http://localhost:8000/api/v1`
 
-Most endpoints require JWT token in Authorization header:
+### Authentication
 
-```bash
-Authorization: Bearer YOUR_ACCESS_TOKEN
-```
+Most endpoints require a JWT token in the Authorization header:
 
-### **Quick Test**
+`Authorization: Bearer YOUR_ACCESS_TOKEN`
+
+### Quick Test
 
 ```bash
 # Health check
@@ -136,7 +108,9 @@ curl -X POST http://localhost:8000/api/v1/users/register \
   -d '{"username":"test","email":"test@test.com","password":"Test123!","fullName":"Test User"}'
 ```
 
-## 📚 **Complete Documentation**
+---
+
+## 📚 Documentation
 
 ### 📖 **[API Documentation](./docs/API_DOCUMENTATION.md)**
 
@@ -158,7 +132,9 @@ Comprehensive backend developer interview guide with questions, answers, and tal
 
 Last-minute interview prep with key concepts and confidence builders.
 
-## 🔗 **Core API Endpoints**
+---
+
+## 🔗 Core API Endpoints
 
 | Category             | Endpoints                                                             | Description          |
 | -------------------- | --------------------------------------------------------------------- | -------------------- |
@@ -171,7 +147,9 @@ Last-minute interview prep with key concepts and confidence builders.
 | **🔔 Subscriptions** | `/subscriptions/c/:channelId`, `/subscriptions/u/:channelId`          | User subscriptions   |
 | **📊 Dashboard**     | `/dashboard/stats`, `/dashboard/videos`                               | Analytics & insights |
 
-## 🧪 **Testing**
+---
+
+## 🧪 Backend Testing
 
 ### **Running Tests**
 
@@ -200,20 +178,67 @@ Tests: 4 passed
 Coverage: 80%+ across all modules
 ```
 
-## 🏗️ **Architecture**
+---
 
-### **Tech Stack**
+## 🎬 Frontend: Youtube Clone
 
-- **Runtime**: Node.js 20+
-- **Framework**: Express.js 5.x
-- **Database**: MongoDB with Mongoose ODM
-- **Authentication**: JWT (jsonwebtoken)
-- **File Storage**: Cloudinary
-- **Validation**: Zod schemas
-- **Testing**: Jest + Supertest
-- **Security**: Helmet, express-rate-limit, bcrypt
+The frontend is a modern, responsive YouTube-inspired platform located in [`Frontend/Youtube`](./Frontend/Youtube).
 
-### **Project Structure**
+### Tech Stack
+
+- React 19
+- Vite
+- Material UI (MUI) & Icons
+- Tailwind CSS
+
+### Key Features
+
+- Material UI components and iconography
+- Utility-first styling with Tailwind CSS
+- Fast, modern development with Vite
+
+### Getting Started
+
+```sh
+cd Frontend/Youtube
+npm install
+npm run dev
+```
+
+### Example: Using Material UI & Icons
+
+```jsx
+import Button from "@mui/material/Button";
+import HomeIcon from "@mui/icons-material/Home";
+
+function App() {
+  return (
+    <div>
+      <HomeIcon />
+      <Button variant="contained">Hello World</Button>
+    </div>
+  );
+}
+```
+
+For more details, see [`Frontend/Youtube/README.md`](./Frontend/Youtube/README.md).
+
+---
+
+## 🏗️ Architecture
+
+### Backend Tech Stack
+
+- Node.js 20+
+- Express.js 5.x
+- MongoDB (Mongoose ODM)
+- JWT authentication
+- Cloudinary file storage
+- Zod validation
+- Jest + Supertest
+- Security: Helmet, express-rate-limit, bcrypt
+
+### Backend Project Structure
 
 ```
 src/
@@ -228,7 +253,9 @@ src/
 └── tests/             # Test suites
 ```
 
-## 🔒 **Security Features**
+---
+
+## 🔒 Security Features
 
 - **JWT Authentication** with access and refresh tokens
 - **Password Hashing** using bcrypt with salt rounds
@@ -239,7 +266,9 @@ src/
 - **MongoDB Injection Protection** with express-mongo-sanitize
 - **XSS Protection** with input sanitization
 
-## 🚀 **Deployment Options**
+---
+
+## 🚀 Deployment Options
 
 ### **Render (Recommended)**
 
@@ -266,7 +295,9 @@ npm i -g vercel
 vercel
 ```
 
-## 📊 **Performance Features**
+---
+
+## 📊 Performance Features
 
 - **Database Indexing** on frequently queried fields
 - **Aggregation Pipelines** for complex queries
@@ -275,7 +306,9 @@ vercel
 - **Image Optimization** via Cloudinary transformations
 - **Request Logging** for monitoring and debugging
 
-## 🤝 **Contributing**
+---
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -283,11 +316,15 @@ vercel
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## 📝 **License**
+---
+
+## 📝 License
 
 This project is licensed under the ISC License - see the [LICENSE](LICENSE) file for details.
 
-## 👨‍💻 **Author**
+---
+
+## 👨‍💻 Author
 
 **Soumabrata Ghosh**
 
@@ -295,7 +332,9 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 - 💼 LinkedIn: [Your LinkedIn Profile]
 - 📧 Email: [Your Email]
 
-## 🙏 **Acknowledgments**
+---
+
+## 🙏 Acknowledgments
 
 - Express.js team for the amazing framework
 - MongoDB team for the robust database
@@ -305,6 +344,8 @@ This project is licensed under the ISC License - see the [LICENSE](LICENSE) file
 
 ---
 
-⭐ **If you found this project helpful, please give it a star!**
+---
 
-_This README provides a quick overview. For detailed information, please refer to the complete documentation linked above._
+⭐ If you found this project helpful, please give it a star!
+
+_For detailed information, please refer to the documentation linked above._
