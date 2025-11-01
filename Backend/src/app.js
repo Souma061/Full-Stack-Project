@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import corsMiddleware from "./middlewares/cors.middleware.js";
 import {
   AppError,
   globalErrorHandler,
@@ -19,6 +20,7 @@ app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ extended: true, limit: "15kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
+app.use(corsMiddleware);
 
 // Health check endpoint
 app.get("/health", (req, res) => {
