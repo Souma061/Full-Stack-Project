@@ -1,8 +1,8 @@
-import cors from 'cors';
+import cors from "cors";
 
 const corsOptions = {
-  origin: 'http://your-allowed-origin.com', // Replace with your allowed origin
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  origin: process.env.CORS_ORIGIN || "*", // Use environment variable or allow all
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
   optionsSuccessStatus: 204,
 };
