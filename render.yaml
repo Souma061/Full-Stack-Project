@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: full-stack-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node Backend/src/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 8000
