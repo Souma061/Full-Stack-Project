@@ -46,6 +46,11 @@ app.get("/health", (req, res) => {
   });
 });
 
+// Favicon endpoint (suppress 404 errors)
+app.get("/favicon.ico", (req, res) => {
+  res.status(204).end();
+});
+
 // Import routes
 import commentRouter from "./routes/comment.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
