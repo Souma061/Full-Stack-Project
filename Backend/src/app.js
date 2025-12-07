@@ -41,6 +41,8 @@ import subscriptionRouter from "./routes/subscription.routes.js";
 import router from "./routes/test.route.js";
 import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
+import tweetRouter from "./routes/tweet.routers.js";
+
 
 // Mount routes (all routes BEFORE error handlers)
 app.use("/api/v1/users", userRouter);
@@ -52,6 +54,7 @@ app.use("/api/v1/subscriptions", subscriptionRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/test", router);
+app.use("/api/v1/tweets", tweetRouter);
 
 // Handle undefined routes (AFTER all valid routes)
 app.use((req, res, next) => {
