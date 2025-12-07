@@ -22,6 +22,21 @@ app.use(express.static("public"));
 app.use(cookieParser());
 app.use(corsMiddleware);
 
+// Root endpoint
+app.get("/", (req, res) => {
+  res.status(200).json({
+    message: "Welcome to Full Stack API",
+    version: "1.0.0",
+    status: "API is running!",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    endpoints: {
+      health: "/health",
+      api: "/api/v1",
+    },
+  });
+});
+
 // Health check endpoint
 app.get("/health", (req, res) => {
   res.status(200).json({
@@ -39,9 +54,9 @@ import likeRouter from "./routes/like.routes.js";
 import playlistRouter from "./routes/playlist.routes.js";
 import subscriptionRouter from "./routes/subscription.routes.js";
 import router from "./routes/test.route.js";
+import tweetRouter from "./routes/tweet.routers.js";
 import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
-import tweetRouter from "./routes/tweet.routers.js";
 
 
 // Mount routes (all routes BEFORE error handlers)
