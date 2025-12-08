@@ -29,7 +29,7 @@ describe("Live API Tests - Render Server", () => {
       expect(response.data).toHaveProperty("status", "API is running!");
       expect(response.data).toHaveProperty("timestamp");
       expect(response.data).toHaveProperty("uptime");
-    });
+    }, 60000);
 
     test("API healthcheck endpoint should work", async () => {
       const response = await api.get("/api/v1/healthcheck");
@@ -38,7 +38,7 @@ describe("Live API Tests - Render Server", () => {
       expect(response.data.message).toBe(
         "Healthcheck data fetched successfully"
       );
-    });
+    }, 60000);
   });
 
   describe("👤 User Routes", () => {
@@ -137,12 +137,12 @@ describe("Live API Tests - Render Server", () => {
 
       expect(response.status).toBe(200);
       expect(response.data.success).toBe(true);
-      expect(response.data.data).toHaveProperty("docs");
-      expect(Array.isArray(response.data.data.docs)).toBe(true);
+      expect(response.data.data).toHaveProperty("videos");
+      expect(Array.isArray(response.data.data.videos)).toBe(true);
 
       // Store a video ID if available for further tests
-      if (response.data.data.docs.length > 0) {
-        videoId = response.data.data.docs[0]._id;
+      if (response.data.data.videos.length > 0) {
+        videoId = response.data.data.videos[0]._id;
       }
     });
 
@@ -198,8 +198,8 @@ describe("Live API Tests - Render Server", () => {
 
       if (response.status === 200) {
         expect(response.data.success).toBe(true);
-        expect(response.data.data).toHaveProperty("docs");
-        expect(Array.isArray(response.data.data.docs)).toBe(true);
+        expect(response.data.data).toHaveProperty("comments");
+        expect(Array.isArray(response.data.data.comments)).toBe(true);
       } else {
         expect([400, 404]).toContain(response.status);
       }
@@ -264,7 +264,7 @@ describe("Live API Tests - Render Server", () => {
 
       if (response.status === 200) {
         expect(response.data.success).toBe(true);
-        expect(response.data.data).toHaveProperty("docs");
+        expect(response.data.data).toHaveProperty("videos");
       } else {
         expect([400, 401]).toContain(response.status);
       }
@@ -336,7 +336,7 @@ describe("Live API Tests - Render Server", () => {
 
       if (response.status === 200) {
         expect(response.data.success).toBe(true);
-        expect(response.data.data).toHaveProperty("docs");
+        expect(response.data.data).toHaveProperty("subscriptions");
       } else {
         expect([400, 401, 404]).toContain(response.status);
       }
@@ -376,7 +376,7 @@ describe("Live API Tests - Render Server", () => {
 
       if (response.status === 200) {
         expect(response.data.success).toBe(true);
-        expect(response.data.data).toHaveProperty("docs");
+        expect(response.data.data).toHaveProperty("videos");
       } else {
         expect([400, 401]).toContain(response.status);
       }
