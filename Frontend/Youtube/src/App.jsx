@@ -3,7 +3,7 @@ import Layout from './Components/Layout/Layout'
 import ProtectedRoute from './Components/ProtectedRoute'
 import Login from './pages/Auth/Login'
 import Register from './pages/Auth/Register'
-import Home from './pages/Home'
+import Home from './pages/home'
 import NotFound from './pages/NotFound'
 
 function App() {
