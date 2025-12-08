@@ -1,7 +1,7 @@
 import cors from "cors";
 
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || "*", // Use environment variable or allow all
+  origin: process.env.CORS_ORIGIN || "http://localhost:5173",
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   credentials: true,
   optionsSuccessStatus: 204,

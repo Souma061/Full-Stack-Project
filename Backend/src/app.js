@@ -1,7 +1,6 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
-import corsMiddleware from "./middlewares/cors.middleware.js";
 import {
   AppError,
   globalErrorHandler,
@@ -9,20 +8,32 @@ import {
 
 const app = express();
 
-// Middleware
+// -----------------------------------------------------
+// CORS CONFIGURATION (WORKING + CORRECT FOR CREDENTIALS)
+// -----------------------------------------------------
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN,
+    origin: ["http://localhost:5173"], // frontend
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Set-Cookie"],
   })
 );
+
+// app.options("(.*)", cors());
+
+// -----------------------------------------------------
+// CORE MIDDLEWARES
+// -----------------------------------------------------
 app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ extended: true, limit: "15kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
-app.use(corsMiddleware);
 
-// Root endpoint
+// -----------------------------------------------------
+// ROOT ENDPOINT
+// -----------------------------------------------------
 app.get("/", (req, res) => {
   res.status(200).json({
     message: "Welcome to Full Stack API",
@@ -37,7 +48,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check endpoint
+// HEALTH CHECK
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "API is running!",
@@ -46,12 +57,12 @@ app.get("/health", (req, res) => {
   });
 });
 
-// Favicon endpoint (suppress 404 errors)
-app.get("/favicon.ico", (req, res) => {
-  res.status(204).end();
-});
+// FAVICON (prevent 404 spam)
+app.get("/favicon.ico", (req, res) => res.status(204).end());
 
-// Import routes
+// -----------------------------------------------------
+// ROUTES
+// -----------------------------------------------------
 import commentRouter from "./routes/comment.routes.js";
 import dashboardRouter from "./routes/dashboard.routes.js";
 import healthcheckRouter from "./routes/healthcheck.routes.js";
@@ -64,7 +75,13 @@ import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js";
 
 
-// Mount routes (all routes BEFORE error handlers)
+// -----------------------------------------------------
+// ROUTES (must be BEFORE error handlers)
+// -----------------------------------------------------
+
+// Healthcheck FIRST (to avoid conflicts)
+app.use("/api/v1/healthcheck", healthcheckRouter);
+
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/videos", videoRouter);
 app.use("/api/v1/videos/:videoId/comments", commentRouter);
@@ -72,16 +89,16 @@ app.use("/api/v1/likes", likeRouter);
 app.use("/api/v1/playlists", playlistRouter);
 app.use("/api/v1/subscriptions", subscriptionRouter);
 app.use("/api/v1/dashboard", dashboardRouter);
-app.use("/api/v1/healthcheck", healthcheckRouter);
 app.use("/api/v1/test", router);
 app.use("/api/v1/tweets", tweetRouter);
 
-// Handle undefined routes (AFTER all valid routes)
+// Handle undefined routes
 app.use((req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
-// Global error handler (MUST BE LAST)
+// Global error handler
 app.use(globalErrorHandler);
+
 
 export { app };

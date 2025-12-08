@@ -1,20 +1,24 @@
-import { useState } from 'react'
-
-import './App.css'
-import {Button} from '@mui/material';
-import Homeicon from '@mui/icons-material/Home';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
+import Layout from './Components/Layout/Layout'
+import ProtectedRoute from './Components/ProtectedRoute'
+import Login from './pages/Auth/Login'
+import Register from './pages/Auth/Register'
+import Home from './pages/Home'
+import NotFound from './pages/NotFound'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-    <h1 className="text-amber-50 " >Youtube Clone</h1>
-    <Homeicon />
-    <Button variant="contained" color="primary">
-      Hello World
-    </Button>
-    </>
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </Router>
   )
 }
 

@@ -1,14 +1,11 @@
-// require('dotenv').config({path:'./.env'});
+// Load environment variables FIRST before importing anything else
 import dotenv from 'dotenv';
-
-// import mongoose from 'mongoose';
-// import {DB_NAME} from './constant.js';
-import { app } from './app.js';
-import connectDB from './db/db.js';
-
 dotenv.config({
   path: './.env'
 });
+
+import { app } from './app.js';
+import connectDB from './db/db.js';
 connectDB()
   .then(() => {
     const PORT = process.env.PORT || 8000;
