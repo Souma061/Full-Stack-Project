@@ -124,7 +124,7 @@ function LoginForm() {
         // Get form data and call handleLogin
       }}
     >
-      {/* Form fields */}
+
     </form>
   );
 }
@@ -154,7 +154,7 @@ function PublishVideoForm() {
         // Get FormData with file and call handlePublish
       }}
     >
-      {/* Form fields */}
+     
     </form>
   );
 }
