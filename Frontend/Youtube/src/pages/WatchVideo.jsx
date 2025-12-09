@@ -7,6 +7,7 @@ import { CircularProgress,Box } from '@mui/material'
 function WatchVideo() {
   const { videoId } = useParams();
   const {data:video, isLoading, error} = useGetVideoById(videoId)
+  const currentUser = null; // Replace with actual user data from context or API hook
 
   if(isLoading) return <CircularProgress />
   if(error) return <div>Error loading video</div>
@@ -55,6 +56,25 @@ function WatchVideo() {
       <div className="bg-gray-900 p-4 rounded-lg">
         <h3 className="font-bold mb-2">Description</h3>
         <p className="text-gray-300">{video.description}</p>
+      </div>
+      <div className="mt-8 border-t border-gray-800 pt-6">
+        <h2 className="text-2xl font-bold mb-4">Discussion ({video.comments?.length || 0})</h2>
+        {/* 1. Add 'Post a Tweet/Comment' Input here */}
+        {currentUser && (
+          <div className="mb-6 flex gap-4">
+            <img src={currentUser?.avatar} className="w-10 h-10 rounded-full" />
+            <input
+              type="text"
+              placeholder="Post a reply..."
+              className="w-full bg-transparent border-b border-gray-700 focus:border-blue-500 outline-none pb-2"
+            />
+          </div>
+        )}
+
+        {/* 2. Map through comments/tweets here */}
+        <div className="space-y-4">
+          {/* You can reuse your TweetCard component here! */}
+        </div>
       </div>
     </div>
   )

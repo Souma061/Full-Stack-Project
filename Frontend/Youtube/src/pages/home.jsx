@@ -36,6 +36,7 @@ function Home() {
       <Grid container spacing={2}>
         {data?.data?.map((video) => (
           <Grid item xs={12} sm={6} md={4} lg={3} key={video._id}>
+            <Link to={`/video/${video._id}`}></Link>
             <div className="bg-gray-900 rounded-lg overflow-hidden hover:shadow-lg cursor-pointer">
               <img
                 src={video.thumbnail}
