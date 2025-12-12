@@ -7,7 +7,7 @@ import {
   togglePublishStatus,
   updateVideo,
 } from "../controllers/video.controller.js";
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { verifyJWT, verifyJWTOptional } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { validateRequest } from "../middlewares/validation.middleware.js";
 import {
@@ -23,6 +23,7 @@ const router = Router();
 router.get("/", validateRequest({ query: VideoListQuery }), getAllVideos);
 router.get(
   "/:videoId",
+  verifyJWTOptional,
   validateRequest({ params: VideoIdParam }),
   getVideoById
 );

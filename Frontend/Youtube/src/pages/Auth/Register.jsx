@@ -1,9 +1,8 @@
-import {useState} from "react";
-import { useNavigate } from "react-router-dom";
+import { CloudUpload } from "@mui/icons-material";
+import { Box, Button, CircularProgress, TextField, Typography } from "@mui/material";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useRegister } from "../../hooks/useAuth";
-import { TextField, Button, CircularProgress, Card} from "@mui/material";
-
-
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -12,16 +11,23 @@ function Register() {
     password: "",
     fullName: "",
     avatar: null,
+    coverImage: null,
   })
   const navigate = useNavigate();
   const register = useRegister();
+
   const handleChange = (e) => {
-    const {name,value} = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    })
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value })
   }
+
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    if (files && files[0]) {
+      setFormData({ ...formData, [name]: files[0] });
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -32,18 +38,49 @@ function Register() {
     }
   }
 
+  const inputStyles = {
+    '& .MuiOutlinedInput-root': {
+      color: 'white',
+      '& fieldset': { borderColor: '#4d4d4d' },
+      '&:hover fieldset': { borderColor: '#aaaaaa' },
+      '&.Mui-focused fieldset': { borderColor: '#3ea6ff' },
+    },
+    '& .MuiInputLabel-root': { color: '#aaaaaa' },
+    '& .MuiInputLabel-root.Mui-focused': { color: '#3ea6ff' },
+  };
+
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-900">
-      <Card className="w-full max-w-md p-6">
-        <h1 className="text-2xl font-bold mb-6">Register</h1>
+    <div className="flex justify-center items-center min-h-screen bg-[#0f0f0f] text-white p-4">
+      <Box
+        sx={{
+          width: '100%',
+          maxWidth: '450px',
+          bgcolor: '#0f0f0f',
+          border: { sm: '1px solid #303030' },
+          borderRadius: '8px',
+          p: { xs: 2, sm: 5 },
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}
+      >
+        <div className="flex items-center gap-1 mb-4">
+          <div className="bg-red-600 text-white rounded-lg p-1">
+            <div className="w-0 h-0 border-t-[6px] border-t-transparent border-l-[12px] border-l-white border-b-[6px] border-b-transparent ml-[3px]"></div>
+          </div>
+          <span className="text-white text-2xl font-bold tracking-tighter font-sans">YouTube</span>
+        </div>
+
+        <Typography variant="h5" sx={{ fontWeight: 400, mb: 1 }}>Create your Account</Typography>
+        <Typography variant="body1" sx={{ mb: 4, color: '#aaaaaa' }}>to continue to YouTube</Typography>
 
         {register.error && (
-          <div className="bg-red-100 p-3 rounded mb-4 text-red-700">
-            {register.error.message}
+          <div className="w-full bg-[#ff00001a] border border-red-900 text-red-500 p-3 rounded mb-4 text-sm">
+            {register.error.response?.data?.message || register.error.message || "Registration failed."}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-4">
           <TextField
             fullWidth
             label="Full Name"
@@ -51,6 +88,9 @@ function Register() {
             value={formData.fullName}
             onChange={handleChange}
             required
+            variant="outlined"
+            size="small"
+            sx={inputStyles}
           />
           <TextField
             fullWidth
@@ -59,6 +99,9 @@ function Register() {
             value={formData.username}
             onChange={handleChange}
             required
+            variant="outlined"
+            size="small"
+            sx={inputStyles}
           />
           <TextField
             fullWidth
@@ -68,6 +111,9 @@ function Register() {
             value={formData.email}
             onChange={handleChange}
             required
+            variant="outlined"
+            size="small"
+            sx={inputStyles}
           />
           <TextField
             fullWidth
@@ -77,28 +123,72 @@ function Register() {
             value={formData.password}
             onChange={handleChange}
             required
+            variant="outlined"
+            size="small"
+            sx={inputStyles}
           />
-          <Button
-            fullWidth
-            variant="contained"
-            color="primary"
-            type="submit"
-            disabled={register.isPending}
-          >
-            {register.isPending ? <CircularProgress size={24} /> : 'Register'}
-          </Button>
-        </form>
 
-        <p className="mt-4 text-center">
-          Already have an account?{' '}
-          <a href="/login" className="text-blue-600">
-            Login
-          </a>
-        </p>
-      </Card>
+          <div className="flex gap-4">
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={<CloudUpload />}
+              fullWidth
+              sx={{
+                color: '#aaaaaa',
+                borderColor: '#4d4d4d',
+                textTransform: 'none',
+                '&:hover': { borderColor: '#aaaaaa', color: 'white' }
+              }}
+            >
+              {formData.avatar ? "Avatar Selected" : "Upload Avatar*"}
+              <input type="file" hidden name="avatar" onChange={handleFileChange} accept="image/*" />
+            </Button>
+            <Button
+              component="label"
+              variant="outlined"
+              startIcon={<CloudUpload />}
+              fullWidth
+              sx={{
+                color: '#aaaaaa',
+                borderColor: '#4d4d4d',
+                textTransform: 'none',
+                '&:hover': { borderColor: '#aaaaaa', color: 'white' }
+              }}
+            >
+              {formData.coverImage ? "Cover Selected" : "Cover Image"}
+              <input type="file" hidden name="coverImage" onChange={handleFileChange} accept="image/*" />
+            </Button>
+          </div>
+
+          <div className="flex justify-between items-center mt-4">
+            <Link to="/login" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: '#3ea6ff', fontWeight: 500, cursor: 'pointer' }}>
+                Sign in instead
+              </Typography>
+            </Link>
+
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={register.isPending}
+              sx={{
+                textTransform: 'none',
+                bgcolor: '#3ea6ff',
+                color: 'black',
+                fontWeight: 600,
+                px: 3,
+                '&:hover': { bgcolor: '#65b8ff' },
+                '&.Mui-disabled': { bgcolor: '#203a54', color: '#606060' }
+              }}
+            >
+              {register.isPending ? <CircularProgress size={24} color="inherit" /> : 'Register'}
+            </Button>
+          </div>
+        </form>
+      </Box>
     </div>
   )
 }
-
 
 export default Register;

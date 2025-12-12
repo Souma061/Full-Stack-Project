@@ -185,57 +185,89 @@ const publishAVideo = asyncHandler(async (req, res) => {
 });
 
 const getVideoById = asyncHandler(async (req, res) => {
-  const { videoId } = req.params; // Zod validated
-  //TODO: get video by id
-  const video = await Video.findByIdAndUpdate(
-    videoId,
-    { $inc: { views: 1 } },
-    { new: true }
-  )
-    .select("-__v")
-    .populate("owner", "username fullName avatar");
-  if (!video) {
-    throw new ApiError(404, "Video not found");
-  }
-  if (
-    !video.isPublished &&
-    video.owner._id.toString() !== req.user?._id?.toString()
-  ) {
-    throw new ApiError(403, "Video is not published");
-  }
+  const { videoId } = req.params;
+  const userId = req.user?._id ? new mongoose.Types.ObjectId(req.user._id) : null;
 
-  // also add this video to user's watch history
-  if (req.user?._id) {
+  // 1. Increment views
+  await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+
+  // 2. Add to watch history if user is logged in
+  if (userId) {
     await User.findByIdAndUpdate(
-      req.user._id,
+      userId,
       {
-        $addToSet: { watchHistory: video._id },
+        $addToSet: { watchHistory: videoId },
       },
       { new: true }
-    ); // addToSet ensures no duplicates
+    );
+  }
+
+  // 3. Aggregate video details
+  const videos = await Video.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(videoId),
+      },
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "video",
+        as: "likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "owner",
+        pipeline: [
+          {
+            $project: {
+              username: 1,
+              fullName: 1,
+              avatar: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        owner: { $first: "$owner" },
+        likesCount: { $size: "$likes" },
+        isLiked: {
+          $cond: {
+            if: { $in: [userId, "$likes.likedBy"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        likes: 0,
+        __v: 0
+      },
+    },
+  ]);
+
+  if (!videos?.length) {
+    throw new ApiError(404, "Video not found");
+  }
+
+  const video = videos[0];
+
+  if (!video.isPublished && (!userId || video.owner._id.toString() !== userId.toString())) {
+    throw new ApiError(403, "Video is not published");
   }
 
   return res
     .status(200)
     .json(new ApiResponse(video, 200, "Video fetched successfully"));
-  // What I have done so far:
-  // 1. Validated video ID
-  // 2. Fetched video by ID and incremented view count
-  // 3. Checked if video exists and is published (if not owner)
-  // 4. Added video to user's watch history if authenticated
-  // 5. Returned structured response with video details
-  // Next steps:
-  // - Test the endpoint with various scenarios (valid ID, invalid ID, unpublished video)
-  // - Handle edge cases (e.g., video not found, database errors)
-  // - Optimize performance if needed (e.g., indexing in MongoDB)
-  // - Ensure proper error handling and logging
-  // - Write unit and integration tests for this functionality
-  // - Update API documentation to reflect new endpoint and response structure
-  // - Review code for best practices and potential improvements
-  // - Deploy changes to staging environment for further testing
-  // - Monitor performance and user feedback after deployment
-  //
-  // - Iterate based on feedback and any issues encountered
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
@@ -390,5 +422,5 @@ export {
   getVideoById,
   publishAVideo,
   togglePublishStatus,
-  updateVideo,
+  updateVideo
 };
