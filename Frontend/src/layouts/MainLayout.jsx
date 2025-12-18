@@ -18,7 +18,7 @@ const SidebarItem = ({ icon: Icon, text, to, isActive, isSidebarOpen }) => (
     className={`flex items-center gap-5 px-3 py-2 rounded-lg hover:bg-[#272727] transition-colors ${isActive ? 'bg-[#272727] font-medium' : ''} ${!isSidebarOpen ? 'justify-center' : ''}`}
     title={!isSidebarOpen ? text : ""}
   >
-    {Icon && <Icon className="text-2xl min-w-[24px]" />}
+    {Icon && <Icon className="text-2xl min-w-6" />}
     <span className={`text-sm truncate ${isSidebarOpen ? '' : 'hidden'}`}>{text}</span>
   </Link>
 );
@@ -80,7 +80,7 @@ function MainLayout() {
           </button>
           <Link to="/" className="flex items-center gap-1">
             <FaYoutube className="text-3xl text-red-600" />
-            <span className="text-xl font-bold tracking-tighter alternate-gothic relative bottom-[1px]">YouTube</span>
+            <span className="text-xl font-bold tracking-tighter alternate-gothic relative bottom-px">YouTube</span>
           </Link>
         </div>
 
@@ -114,7 +114,7 @@ function MainLayout() {
         </form>
 
         {/* Right Section: Actions & Profile */}
-        <div className="flex items-center gap-2 justify-end min-w-[225px] sm:min-w-0">
+        <div className="flex items-center gap-2 justify-end min-w-56 sm:min-w-0">
           {/* Action Buttons (Hidden on very small screens if needed) */}
           <div className="flex items-center gap-1 sm:gap-2">
             <button className="p-2 hover:bg-[#272727] rounded-full transition-colors">
@@ -155,7 +155,7 @@ function MainLayout() {
 
                 {/* Dropdown Menu */}
                 {isProfileOpen && (
-                  <div className="absolute right-0 top-12 w-72 bg-[#282828] border border-[#3e3e3e] rounded-xl shadow-2xl p-4 z-[60] cursor-default" onClick={(e) => e.stopPropagation()}>
+                  <div className="absolute right-0 top-12 w-72 bg-[#282828] border border-[#3e3e3e] rounded-xl shadow-2xl p-4 z-60 cursor-default" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-start gap-3 border-b border-[#3e3e3e] pb-3 mb-2">
                       {user.avatar ? (
                         <img src={user.avatar} alt={user.fullName || 'Profile'} className="w-10 h-10 rounded-full object-cover" />
@@ -194,8 +194,8 @@ function MainLayout() {
 
         {/* Sidebar */}
         <aside
-          className={`flex-shrink-0 bg-[#0f0f0f] h-full overflow-y-auto custom-scrollbar flex flex-col p-2 transition-all duration-200
-          ${isSidebarOpen ? 'w-[240px]' : 'w-[72px] items-center'}`}
+          className={`shrink-0 bg-[#0f0f0f] h-full overflow-y-auto custom-scrollbar flex flex-col p-2 transition-all duration-200
+          ${isSidebarOpen ? 'w-60' : 'w-18 items-center'}`}
         >
           {/* Main Links */}
           <div className="flex flex-col border-b border-[#303030] pb-2 mb-2 w-full">

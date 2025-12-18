@@ -1,31 +1,52 @@
 import { useEffect, useState } from 'react';
+import { getAllVideos } from '../api/video.api';
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // TODO: Fetch videos from backend
-    // Example:
-    // const fetchVideos = async () => {
-    //   try {
-    //     const { data } = await axiosInstance.get('/videos');
-    //     setVideos(data);
-    //   } catch (error) {
-    //     console.error(error);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-    // fetchVideos();
+    const fetchVideos = async () => {
+      try {
+        setLoading(true);
+        // Fetch videos (page 1, limit 12, etc.)
+        const response = await getAllVideos(1, 12);
+        // Adjust depending on your API response structure.
+        // If your API returns { data: { docs: [...] } }, use response.data.docs
+        // If your API returns { data: [...] }, use response.data
+        // Based on typical express-paginate or aggregation:
+        setVideos(response.data?.docs || response.data || []);
+      } catch (error) {
+        console.error("Error fetching videos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    // Simulating loading for layout demonstration
-    const timer = setTimeout(() => {
-      setLoading(false);
-      setVideos([]); // Set to empty to show "No videos" state or keep mock for dev if requested (but user asked to remove mock)
-    }, 1500);
-    return () => clearTimeout(timer);
+    fetchVideos();
   }, []);
+
+  // Helper function to format duration (seconds -> MM:SS)
+  const formatDuration = (seconds) => {
+    if (!seconds) return "00:00";
+    const min = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${min}:${sec < 10 ? '0' + sec : sec}`;
+  };
+
+  // Helper for date formatting
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now - date);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return `${Math.floor(diffDays / 365)} years ago`;
+  };
 
   return (
     <div className='bg-[#0f0f0f] text-white p-4 min-h-full'>
@@ -68,14 +89,14 @@ const Home = () => {
           {videos.map((video) => (
             <div key={video._id} className='flex flex-col gap-2 cursor-pointer group'>
               <div className='relative w-full aspect-video rounded-xl overflow-hidden bg-[#1f1f1f]'>
-                <img src={video.thumbnail?.url || "https://via.placeholder.com/320x180"} alt={video.title} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-200' />
+                <img src={video.thumbnail?.url || video.thumbnail || "https://via.placeholder.com/320x180"} alt={video.title} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-200' />
                 <span className='absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded'>
                   {formatDuration(video.duration)}
                 </span>
               </div>
 
               <div className='flex gap-3 mt-1'>
-                <img src={video.owner?.avatar?.url || "https://via.placeholder.com/150"} alt="Avatar" className='w-9 h-9 rounded-full object-cover bg-gray-700' />
+                <img src={video.owner?.avatar?.url || video.owner?.avatar || "https://via.placeholder.com/150"} alt="Avatar" className='w-9 h-9 rounded-full object-cover bg-gray-700' />
                 <div className='flex flex-col'>
                   <h3 className='text-base font-semibold line-clamp-2 leading-tight group-hover:text-blue-400 decoration-transparent transition-colors'>
                     {video.title}
@@ -93,27 +114,5 @@ const Home = () => {
     </div>
   );
 };
-
-// Helper function to format duration (assuming seconds)
-const formatDuration = (seconds) => {
-  if (!seconds) return "00:00";
-  const min = Math.floor(seconds / 60);
-  const sec = Math.floor(seconds % 60);
-  return `${min}:${sec < 10 ? '0' + sec : sec}`;
-};
-
-// Helper for date
-const formatDate = (dateString) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffTime = Math.abs(now - date);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-  if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-  return `${Math.floor(diffDays / 365)} years ago`;
-}
 
 export default Home;
