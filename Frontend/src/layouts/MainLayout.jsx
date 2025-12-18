@@ -18,7 +18,7 @@ const SidebarItem = ({ icon: Icon, text, to, isActive, isSidebarOpen }) => (
     className={`flex items-center gap-5 px-3 py-2 rounded-lg hover:bg-[#272727] transition-colors ${isActive ? 'bg-[#272727] font-medium' : ''} ${!isSidebarOpen ? 'justify-center' : ''}`}
     title={!isSidebarOpen ? text : ""}
   >
-    <Icon className="text-2xl min-w-[24px]" />
+    {Icon && <Icon className="text-2xl min-w-[24px]" />}
     <span className={`text-sm truncate ${isSidebarOpen ? '' : 'hidden'}`}>{text}</span>
   </Link>
 );
@@ -28,6 +28,7 @@ function MainLayout() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const profileRef = useRef(null);
 
@@ -37,6 +38,13 @@ function MainLayout() {
   };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+    }
+  };
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -78,21 +86,32 @@ function MainLayout() {
 
         {/* Center Section: Search Bar */}
         {/* We use 'max-w-2xl' to limit width on large screens, and 'justify-self-center' to keep it in the middle */}
-        <div className="hidden md:flex flex-1 items-center gap-4 w-full max-w-[720px] justify-self-center">
+        <form onSubmit={handleSearch} className="hidden md:flex flex-1 items-center gap-4 w-full max-w-180 justify-self-center">
           <div className="flex flex-1 items-center bg-[#121212] border border-[#303030] rounded-full overflow-hidden shadow-inner ml-8">
             <input
               type="text"
               placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-transparent text-white px-4 py-2 focus:outline-none placeholder-gray-500"
+              aria-label="Search videos"
             />
-            <button className="bg-[#222222] border-l border-[#303030] px-5 py-2 hover:bg-[#303030] transition-colors cursor-pointer flex items-center justify-center">
+            <button
+              type="submit"
+              className="bg-[#222222] border-l border-[#303030] px-5 py-2 hover:bg-[#303030] transition-colors cursor-pointer flex items-center justify-center"
+              aria-label="Search"
+            >
               <IoSearchOutline className="text-xl" />
             </button>
           </div>
-          <button className="p-2.5 bg-[#181818] hover:bg-[#303030] rounded-full transition-colors flex-shrink-0">
+          <button
+            type="button"
+            className="p-2.5 bg-[#181818] hover:bg-[#303030] rounded-full transition-colors shrink-0"
+            aria-label="Search with voice"
+          >
             <IoMicSharp className="text-xl" />
           </button>
-        </div>
+        </form>
 
         {/* Right Section: Actions & Profile */}
         <div className="flex items-center gap-2 justify-end min-w-[225px] sm:min-w-0">
@@ -109,30 +128,37 @@ function MainLayout() {
           {/* Profile / Sign In */}
           <div className="ml-2 pl-2">
             {user ? (
-              <div ref={profileRef} className="relative cursor-pointer" onClick={() => setIsProfileOpen(!isProfileOpen)}>
-                {/* Avatar rendering with Fallback */}
-                {user.avatar ? (
-                  <img
-                    src={user.avatar}
-                    alt="Avatar"
-                    className="w-8 h-8 rounded-full object-cover bg-gray-700 select-none"
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = "https://ui-avatars.com/api/?name=" + (user.fullName || "User") + "&background=random";
-                    }}
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold select-none text-white">
-                    {(user.fullName?.[0] || user.username?.[0] || "U").toUpperCase()}
-                  </div>
-                )}
+              <div ref={profileRef} className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                  aria-label="Profile menu"
+                  aria-expanded={isProfileOpen}
+                >
+                  {/* Avatar rendering with Fallback */}
+                  {user.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.fullName || 'User Avatar'}
+                      className="w-8 h-8 rounded-full object-cover bg-gray-700 select-none"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user.fullName || "User") + "&background=random";
+                      }}
+                    />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold select-none text-white">
+                      {(user.fullName?.[0] || user.username?.[0] || "U").toUpperCase()}
+                    </div>
+                  )}
+                </button>
 
                 {/* Dropdown Menu */}
                 {isProfileOpen && (
                   <div className="absolute right-0 top-12 w-72 bg-[#282828] border border-[#3e3e3e] rounded-xl shadow-2xl p-4 z-[60] cursor-default" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-start gap-3 border-b border-[#3e3e3e] pb-3 mb-2">
                       {user.avatar ? (
-                        <img src={user.avatar} className="w-10 h-10 rounded-full object-cover" />
+                        <img src={user.avatar} alt={user.fullName || 'Profile'} className="w-10 h-10 rounded-full object-cover" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-lg font-bold">
                           {(user.fullName?.[0] || user.username?.[0] || "U").toUpperCase()}
@@ -174,8 +200,8 @@ function MainLayout() {
           {/* Main Links */}
           <div className="flex flex-col border-b border-[#303030] pb-2 mb-2 w-full">
             <SidebarItem icon={MdHomeFilled} text="Home" to="/" isActive={location.pathname === '/'} isSidebarOpen={isSidebarOpen} />
-            <SidebarItem icon={SiYoutubeshorts} text="Shorts" isSidebarOpen={isSidebarOpen} />
-            <SidebarItem icon={MdOutlineSubscriptions} text="Subscriptions" isSidebarOpen={isSidebarOpen} />
+            <SidebarItem icon={SiYoutubeshorts} text="Shorts" to="/shorts" isActive={location.pathname === '/shorts'} isSidebarOpen={isSidebarOpen} />
+            <SidebarItem icon={MdOutlineSubscriptions} text="Subscriptions" to="/subscriptions" isActive={location.pathname === '/subscriptions'} isSidebarOpen={isSidebarOpen} />
           </div>
 
           {/* Library Links */}
@@ -187,10 +213,10 @@ function MainLayout() {
             )}
             {!isSidebarOpen && <div className="h-4"></div>} {/* Spacer for collapsed mode */}
 
-            <SidebarItem icon={MdHistory} text="History" isSidebarOpen={isSidebarOpen} />
-            <SidebarItem icon={MdOutlineVideoLibrary} text="Your videos" isSidebarOpen={isSidebarOpen} />
-            <SidebarItem icon={MdOutlineWatchLater} text="Watch Later" isSidebarOpen={isSidebarOpen} />
-            <SidebarItem icon={MdThumbUp} text="Liked videos" isSidebarOpen={isSidebarOpen} />
+            <SidebarItem icon={MdHistory} text="History" to="/history" isActive={location.pathname === '/history'} isSidebarOpen={isSidebarOpen} />
+            <SidebarItem icon={MdOutlineVideoLibrary} text="Your videos" to="/my-videos" isActive={location.pathname === '/my-videos'} isSidebarOpen={isSidebarOpen} />
+            <SidebarItem icon={MdOutlineWatchLater} text="Watch Later" to="/watch-later" isActive={location.pathname === '/watch-later'} isSidebarOpen={isSidebarOpen} />
+            <SidebarItem icon={MdThumbUp} text="Liked videos" to="/liked-videos" isActive={location.pathname === '/liked-videos'} isSidebarOpen={isSidebarOpen} />
           </div>
 
           {/* Sign in Prompt */}
@@ -207,9 +233,9 @@ function MainLayout() {
           {isSidebarOpen && (
             <div className="px-4 py-4 text-[12px] text-[#aaaaaa] font-medium">
               <div className="flex flex-wrap gap-2 mb-2">
-                <span>About</span><span>Press</span><span>Copyright</span>
-                <span>Contact us</span><span>Creators</span><span>Advertise</span>
-                <span>Developers</span>
+                {['About', 'Press', 'Copyright', 'Contact us', 'Creators', 'Advertise', 'Developers'].map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
               </div>
               <p className="text-[#717171] mt-2">© 2025 Google LLC</p>
             </div>
