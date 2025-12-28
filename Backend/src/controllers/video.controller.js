@@ -114,8 +114,14 @@ const getAllVideos = asyncHandler(async (req, res) => {
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
-  const { title, description } = req.body; // Zod validated
-  // TODO: get video, upload to cloudinary, create video
+  const { title, description } = req.body;
+
+  // Validate required fields
+  if (!title || !description) {
+    throw new ApiError(400, "Title and description are required");
+  }
+
+  // Get uploaded files
   const videoFileLocalPath = req.files?.videoFile?.[0]?.path;
   const thumbnailLocalPath = req.files?.thumbnail?.[0]?.path;
 
@@ -123,43 +129,36 @@ const publishAVideo = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Video file is required");
   }
   if (!thumbnailLocalPath) {
-    throw new ApiError(400, "Video thumbnail is required");
+    throw new ApiError(400, "Thumbnail is required");
   }
 
-  // upload to cloudinary
+  // Upload files to Cloudinary
+  const uploadedVideo = await uploadOnCloudinary(videoFileLocalPath);
+  const uploadedThumbnail = await uploadOnCloudinary(thumbnailLocalPath);
 
-  const videoFile = await uploadOnCloudinary(videoFileLocalPath); // upload to cloudinary
-  const thumbnail = await uploadOnCloudinary(thumbnailLocalPath);
-
-  if (!videoFile?.url) {
-    throw new ApiError(
-      500,
-      "Could not upload video file. Please try again later"
-    );
+  if (!uploadedVideo) {
+    throw new ApiError(500, "Failed to upload video to Cloudinary");
   }
-  if (!thumbnail?.url) {
-    throw new ApiError(
-      500,
-      "Could not upload video thumbnail. Please try again later"
-    );
+  if (!uploadedThumbnail) {
+    throw new ApiError(500, "Failed to upload thumbnail to Cloudinary");
   }
 
   const video = await Video.create({
-    // create video document in db
     title: title.trim(),
     description: description.trim(),
-    videoFiles: videoFile.url,
-    thumbnail: thumbnail.url,
-    duration: videoFile.duration || 0,
+    videoFiles: uploadedVideo.secure_url,
+    thumbnail: uploadedThumbnail.secure_url,
+    duration: uploadedVideo.duration || 0,
     owner: req.user._id,
     isPublished: true,
   });
+
   const createVideo = await Video.findById(video?._id)
     .populate(
-      "owner", // populate owner details
+      "owner",
       "username fullName avatar"
     )
-    .select("-__v"); // exclude __v field
+    .select("-__v");
 
   return res
     .status(201)

@@ -9,17 +9,13 @@ export const VideoListQuery = PaginationQuery.extend({
     .optional(),
   sortType: z.enum(["asc", "desc"]).optional(),
   userId: ObjectIdSchema.optional(),
-  query: z.string().trim().min(1).max(100).optional(),
+  query: z.string().trim().min(0).max(100).optional(),
 }).strict();
 
 export const VideoCreateBody = z
   .object({
     title: z.string().trim().min(1).max(200),
     description: z.string().trim().max(2000),
-    privacy: z
-      .enum(["public", "private", "unlisted"])
-      .default("public")
-      .optional(),
   })
   .strict();
 

@@ -117,9 +117,9 @@ function MainLayout() {
         <div className="flex items-center gap-2 justify-end min-w-56 sm:min-w-0">
           {/* Action Buttons (Hidden on very small screens if needed) */}
           <div className="flex items-center gap-1 sm:gap-2">
-            <button className="p-2 hover:bg-[#272727] rounded-full transition-colors">
+            <Link to="/upload" className="p-2 hover:bg-[#272727] rounded-full transition-colors" title="Create">
               <RiVideoAddLine className="text-xl" />
-            </button>
+            </Link>
             <button className="p-2 hover:bg-[#272727] rounded-full transition-colors">
               <FaRegBell className="text-xl" />
             </button>

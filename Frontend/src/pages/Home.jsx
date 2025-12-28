@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAllVideos } from '../api/video.api';
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -11,13 +13,21 @@ const Home = () => {
         setLoading(true);
         // Fetch videos (page 1, limit 12, etc.)
         const response = await getAllVideos(1, 12);
-        // Adjust depending on your API response structure.
-        // If your API returns { data: { docs: [...] } }, use response.data.docs
-        // If your API returns { data: [...] }, use response.data
-        // Based on typical express-paginate or aggregation:
-        setVideos(response.data?.docs || response.data || []);
+        // response structure: { statusCode: 200, data: { videos: [...], pagination: {...} }, message: "...", success: true }
+        console.log("getAllVideos Full Response:", response);
+        console.log("response.data:", response?.data);
+        console.log("response.data.videos:", response?.data?.videos);
+
+        if (response?.data?.videos && Array.isArray(response.data.videos)) {
+          console.log("Setting videos:", response.data.videos);
+          setVideos(response.data.videos);
+        } else {
+          console.log("No videos in response, setting empty array");
+          setVideos([]);
+        }
       } catch (error) {
         console.error("Error fetching videos:", error);
+        setVideos([]);
       } finally {
         setLoading(false);
       }
@@ -87,7 +97,11 @@ const Home = () => {
       ) : (
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-y-8 gap-x-4'>
           {videos.map((video) => (
-            <div key={video._id} className='flex flex-col gap-2 cursor-pointer group'>
+            <div
+              key={video._id}
+              className='flex flex-col gap-2 cursor-pointer group'
+              onClick={() => navigate(`/video/${video._id}`)}
+            >
               <div className='relative w-full aspect-video rounded-xl overflow-hidden bg-[#1f1f1f]'>
                 <img src={video.thumbnail?.url || video.thumbnail || "https://via.placeholder.com/320x180"} alt={video.title} className='w-full h-full object-cover group-hover:scale-105 transition-transform duration-200' />
                 <span className='absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded'>

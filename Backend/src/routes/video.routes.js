@@ -11,16 +11,14 @@ import { verifyJWT, verifyJWTOptional } from "../middlewares/auth.middleware.js"
 import { upload } from "../middlewares/multer.middleware.js";
 import { validateRequest } from "../middlewares/validation.middleware.js";
 import {
-  VideoCreateBody,
   VideoIdParam,
-  VideoListQuery,
-  VideoUpdateBody,
+  VideoUpdateBody
 } from "../schemas/video.schemas.js";
 
 const router = Router();
 
 // Public routes (no auth required)
-router.get("/", validateRequest({ query: VideoListQuery }), getAllVideos);
+router.get("/", getAllVideos);
 router.get(
   "/:videoId",
   verifyJWTOptional,
@@ -35,9 +33,8 @@ router.post(
   verifyJWT,
   upload.fields([
     { name: "videoFile", maxCount: 1 },
-    { name: "thumbnail", maxCount: 1 },
+    { name: "thumbnail", maxCount: 1 }
   ]),
-  validateRequest({ body: VideoCreateBody }), // add this
   publishAVideo
 );
 

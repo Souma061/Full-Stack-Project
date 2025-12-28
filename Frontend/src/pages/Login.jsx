@@ -22,13 +22,16 @@ const Login = () => {
 
       console.log("Logged in successfully", response);
 
-      if (response?.data?.user) {
+      const { accessToken, refreshToken, user } = response.data;
+      if (accessToken) localStorage.setItem("accessToken", accessToken);
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+      if (user) {
+        setAuthUser(user);
+      } else if (response.data.user) {
         setAuthUser(response.data.user);
-      } else if (response?.user) {
-        setAuthUser(response.user);
       } else {
-        // Fallback if structure is different
-        setAuthUser(response.data || response);
+        setAuthUser(response.data);
       }
       navigate('/');
 

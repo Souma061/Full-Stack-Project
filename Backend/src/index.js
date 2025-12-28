@@ -1,16 +1,21 @@
-// Load environment variables FIRST before importing anything else
 import dotenv from 'dotenv';
+import path from 'path';
+
+// Resolve path to root .env file (assuming CWD is Backend/)
 dotenv.config({
-  path: './.env'
+  path: path.resolve(process.cwd(), '../.env')
 });
 
+console.log("DEBUG: Cloudinary Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME ? "LOADED" : "MISSING " + process.cwd());
+
+// Trigger restart 6
 import { app } from './app.js';
 import connectDB from './db/db.js';
 connectDB()
   .then(() => {
     const PORT = process.env.PORT || 8000;
 
-    const server = app.listen(PORT, () => {
+    const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server is running on port ${PORT}`);
     });
 
