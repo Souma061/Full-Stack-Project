@@ -28,7 +28,13 @@ app.use(
 // -----------------------------------------------------
 app.use(express.json({ limit: "15kb" }));
 app.use(express.urlencoded({ extended: true, limit: "15kb" }));
-app.use(express.static("public"));
+// Only serve specific public directories, NOT temp files
+app.use(express.static("public", {
+  etag: false,
+  index: false,
+  // Prevent serving temp files
+  dotfiles: "deny"
+}));
 app.use(cookieParser());
 
 // -----------------------------------------------------

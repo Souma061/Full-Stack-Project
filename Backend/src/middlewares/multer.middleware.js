@@ -7,13 +7,17 @@ const __dirname = path.dirname(__filename);
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    
-    const tempPath = path.join(__dirname, "../../public/temp");
-    cb(null, tempPath);
+    // Store temp files outside public directory for security
+    cb(null, path.join(__dirname, '../../.temp'))
   },
   filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+  }
+})
 
-export const upload = multer({ storage });
+export const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});

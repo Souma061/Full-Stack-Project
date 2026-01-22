@@ -72,6 +72,13 @@ const registerUser = asyncHandler(async (req, res) => {
   //   throw new ApiError(400, "Avatar is required");
   // }
 
+
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+  if (!createdUser) {
+    throw new ApiError(500, "User not created");
+  }
   let avatar = null;
   if (avatarLocalPath) {
     avatar = await uploadOnCloudinary(avatarLocalPath);
@@ -83,9 +90,6 @@ const registerUser = asyncHandler(async (req, res) => {
   const coverImage = coverImageLocalPath
     ? await uploadOnCloudinary(coverImageLocalPath)
     : null;
-
-  // Removed the redundant avatar check since avatar is now optional
-
   const user = await User.create({
     fullName,
     avatar: avatar?.url || null, // Handle null avatar
@@ -95,12 +99,9 @@ const registerUser = asyncHandler(async (req, res) => {
     username: username.toLowerCase(),
   });
 
-  const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
-  if (!createdUser) {
-    throw new ApiError(500, "User not created");
-  }
+  // Removed the redundant avatar check since avatar is now optional
+
+
   return res
     .status(201)
     .json(new ApiResponse(createdUser, 201, "User registered successfully"));
@@ -126,7 +127,7 @@ const loginUser = asyncHandler(async (req, res) => {
       Boolean
     ),
   });
-  if(!user) {
+  if (!user) {
     throw new ApiError(401, "Invalid credentials");
   }
   const isMatch = await user.isPasswordCorrect(password);
@@ -294,39 +295,44 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
 
   const normalized = { fullName, username, email };
 
-  const conflict = await User.findOne({
-    _id: { $ne: req.user._id },
-    $or: [{ username: normalized.username }, { email: normalized.email }],
-  }).lean();
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: normalized },
+      { new: true, runValidators: true }
+    ).select("-password -refreshToken");
 
-  if (conflict) {
-    throw new ApiError(409, "Email or username already in use");
+    if (!updatedUser) {
+      throw new ApiError(404, "User not found");
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(updatedUser, 200, "Account details updated successfully")
+      );
+  } catch (error) {
+    // Handle MongoDB duplicate key error (E11000)
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      throw new ApiError(
+        409,
+        `${field.charAt(0).toUpperCase() + field.slice(1)} is already in use`
+      );
+    }
+    // Re-throw other errors to be handled by global error middleware
+    throw error;
   }
-
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user._id,
-    { $set: normalized },
-    { new: true, runValidators: true }
-  ).select("-password -refreshToken");
-
-  if (!updatedUser) { 
-    throw new ApiError(404, "User not found");
-  }
-
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(updatedUser, 200, "Account details updated successfully")
-    );
 
   // What I have done so far:
-  // 1. Validated input fields
-  // 2. Checked for email/username conflicts
-  // 3. Updated user details in DB
+  // 1. Validated input fields via Zod
+  // 2. Performed atomic update with validators enabled
+  // 3. Handled E11000 duplicate key errors explicitly
   // 4. Returned updated user data
-  // Next steps:
-  // - Handle edge cases (e.g., invalid email format)
-  // - Test the endpoint with various scenarios (conflicts, successful update)
+  // Improvements:
+  // - Removed pre-flight uniqueness check to prevent race conditions
+  // - Used single atomic operation for durability
+  // - Added explicit E11000 error handling with field identification
 });
 
 const updateUserAvatar = asyncHandler(async (req, res) => {
@@ -532,7 +538,7 @@ export {
   registerUser,
   updateAccountDetails,
   updateUserAvatar,
-  updateUserCoverImage,
+  updateUserCoverImage
 };
 
 // aggregate pipeline: mongoose model function that allows us to perform complex data processing and transformation operations on the documents in a collection
